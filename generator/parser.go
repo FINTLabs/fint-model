@@ -9,6 +9,8 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/utils"
 )
 
+
+
 func GetClasses(tag string) []Class {
 	doc := document.Get(tag)
 
@@ -22,7 +24,8 @@ func GetClasses(tag string) []Class {
 		class.Extends = getExtends(doc, c)
 		class.Attributes = getAttributes(c)
 		class.Relations = getAssociations(doc, c)
-		class.Package = getPackagePath(c, doc) //getPackagePath(doc, getPackage(c))
+		class.Package = getPackagePath(c, doc)
+		class.Namespace = getNamespacePath(c, doc)
 
 		classes = append(classes, class)
 	}
@@ -33,6 +36,26 @@ func GetClasses(tag string) []Class {
 
 
 func getPackagePath(c *xmlquery.Node, doc *xmlquery.Node) string {
+
+	var pkgs []string
+	var parentPkg string
+	classPkg := getPackage(c)
+	pkgs = append(pkgs, getNameLower(classPkg, doc))
+
+	// TODO: This needs to be done much better
+	parentPkg = getParentPackage(classPkg, doc)
+	parentPkg2 := getParentPackage(parentPkg, doc)
+	parentPkg3 := getParentPackage(parentPkg2, doc)
+
+	pkgs = append(pkgs, getNameLower(parentPkg, doc), getNameLower(parentPkg2, doc), getNameLower(parentPkg3, doc))
+
+	pkgs = utils.TrimArray(pkgs)
+	pkgs = utils.Reverse(pkgs)
+	return fmt.Sprintf("%s.%s", JAVA_PACKAGE_BASE, strings.Join(pkgs, "."))
+
+}
+
+func getNamespacePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 
 	var pkgs []string
 	var parentPkg string
@@ -48,7 +71,7 @@ func getPackagePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 
 	pkgs = utils.TrimArray(pkgs)
 	pkgs = utils.Reverse(pkgs)
-	return strings.Join(pkgs, ".")
+	return fmt.Sprintf("%s.%s", NET_PACKAGE_BASE, strings.Join(pkgs, "."))
 
 }
 
@@ -62,7 +85,12 @@ func getName(idref string, doc *xmlquery.Node) string {
 		name = strings.Replace(name, "FINT", "", -1)
 		name = strings.Replace(name, "Model", "", -1)
 	}
-	return strings.Replace(strings.ToLower(name), " ", "", -1)
+	return strings.Replace(name, " ", "", -1)
+}
+
+func getNameLower(idref string, doc *xmlquery.Node) string {
+
+	return strings.ToLower(getName(idref, doc))
 }
 
 func getParentPackage(idref string, doc *xmlquery.Node) string {

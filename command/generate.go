@@ -74,7 +74,7 @@ func setupJavaDirStructure(tag string) {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
-	for _, pkg := range packages.DistinctList(tag) {
+	for _, pkg := range packages.DistinctPackageList(tag) {
 		path := fmt.Sprintf("%s/%s", basePath, strings.Replace(pkg, ".", "/", -1))
 		err := os.MkdirAll(path, 0777)
 		if err != nil {

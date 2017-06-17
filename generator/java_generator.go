@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-const JAVA_CLASS_TEMPLATE = "package no.fint.model.%s;\n\n" +
+const JAVA_CLASS_TEMPLATE = "package %s;\n\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
 	"import lombok.EqualsAndHashCode;\n" +
@@ -22,7 +22,7 @@ const JAVA_ATTRIBUTE_TEMPLATE = "    private %s %s;\n"
 
 const JAVA_RELATION_TEMPLATE = "    public enum Relasjonsnavn {\n%s\n    }"
 
-const JAVA_EXTENDED_CLASS_TEMPLATE = "package no.fint.model.%s;\n\n" +
+const JAVA_EXTENDED_CLASS_TEMPLATE = "package %s;\n\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
 	"import lombok.EqualsAndHashCode;\n" +
@@ -35,7 +35,7 @@ const JAVA_EXTENDED_CLASS_TEMPLATE = "package no.fint.model.%s;\n\n" +
 	"%s\n" + // properties
 	"}"
 
-const JAVA_ABSTRACT_CLASS_TEMPLATE = "package no.fint.model.%s;\n\n" +
+const JAVA_ABSTRACT_CLASS_TEMPLATE = "package %s;\n\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
 	"import lombok.EqualsAndHashCode;\n" +
@@ -48,7 +48,7 @@ const JAVA_ABSTRACT_CLASS_TEMPLATE = "package no.fint.model.%s;\n\n" +
 	"%s\n" + // properties
 	"}"
 
-const JAVA_ABSTRACT_EXTENDED_CLASS_TEMPLATE = "package no.fint.model.%s;\n\n" +
+const JAVA_ABSTRACT_EXTENDED_CLASS_TEMPLATE = "package %s;\n\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
 	"import lombok.EqualsAndHashCode;\n" +
@@ -68,6 +68,8 @@ var JAVA_TYPE_MAP = map[string]string{
 	"dateTime": "Date",
 	"double":   "double",
 }
+
+const JAVA_PACKAGE_BASE = "no.fint.model"
 
 func GetJavaClass(c Class) string {
 

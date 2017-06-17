@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-func CmdListPackages(c *cli.Context) {
+func CmdListNamespaces(c *cli.Context) {
 	var tag string
 	if c.GlobalString("tag") == "latest" {
 		tag = github.GetLatest()
@@ -15,9 +15,7 @@ func CmdListPackages(c *cli.Context) {
 		tag = c.GlobalString("tag")
 	}
 
-	//document.GetFile(tag)
-
-	for _, p := range packages.DistinctPackageList(tag) {
+	for _, p := range packages.DistinctNamespaceList(tag) {
 		fmt.Println(p)
 	}
 }

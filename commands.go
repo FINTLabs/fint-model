@@ -38,8 +38,14 @@ var Commands = []cli.Command{
 	},
 	{
 		Name:   "listPackages",
-		Usage:  "",
+		Usage:  "list Java packages",
 		Action: command.CmdListPackages,
+		Flags:  []cli.Flag{},
+	},
+	{
+		Name:   "listNamespaces",
+		Usage:  "list .Net namespaces",
+		Action: command.CmdListNamespaces,
 		Flags:  []cli.Flag{},
 	},
 	{
