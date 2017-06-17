@@ -13,7 +13,7 @@ func main() {
 	app.Version = Version
 	app.Author = "FINTProsjektet"
 	app.Email = ""
-	app.Usage = ""
+	app.Usage = "Generates Java and C# models from EA XMI export."
 
 	app.Flags = GlobalFlags
 	app.Commands = Commands
