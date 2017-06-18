@@ -9,6 +9,7 @@ find it usefull, please use it!
 ## Usage
 
 ```
+fint-model                                                     ✓  3268  19:46:17
 NAME:
    fint-model - Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use, but if you find it usefull, please use it!
 
@@ -22,7 +23,7 @@ AUTHOR:
    FINTProsjektet
 
 COMMANDS:
-     printClasses
+     printClasses    list classes
      generate
      listPackages    list Java packages
      listNamespaces  list .Net namespaces

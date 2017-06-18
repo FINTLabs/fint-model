@@ -25,7 +25,7 @@ var GlobalFlags = []cli.Flag{
 var Commands = []cli.Command{
 	{
 		Name:   "printClasses",
-		Usage:  "",
+		Usage:  "list classes",
 		Action: classes.CmdPrintClasses,
 		Flags:  []cli.Flag{},
 	},
