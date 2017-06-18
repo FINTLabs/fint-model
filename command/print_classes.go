@@ -3,8 +3,8 @@ package command
 import (
 	"github.com/codegangsta/cli"
 	"fmt"
-	"github.com/FINTprosjektet/fint-model/generator"
-	"github.com/FINTprosjektet/fint-model/github"
+	"github.com/FINTprosjektet/fint-model/common/github"
+	"github.com/FINTprosjektet/fint-model/common/parser"
 )
 
 func CmdPrintClasses(c *cli.Context) {
@@ -15,7 +15,7 @@ func CmdPrintClasses(c *cli.Context) {
 		tag = c.GlobalString("tag")
 	}
 
-	classes := generator.GetClasses(tag)
+	classes := parser.GetClasses(tag)
 
 	for _, c := range classes {
 		dumpClass(c)
@@ -23,7 +23,7 @@ func CmdPrintClasses(c *cli.Context) {
 
 }
 
-func dumpClass(c generator.Class) {
+func dumpClass(c parser.Class) {
 	fmt.Printf("Class: %s\n", c.Name)
 	fmt.Printf("  Abstract: %t\n", c.Abstract)
 	if len(c.Extends) > 0 {

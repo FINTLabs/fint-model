@@ -4,7 +4,7 @@
 
 // +build ignore
 
-// Language tag table generator.
+// Language tag table generate.
 // Data read from the web.
 
 package main

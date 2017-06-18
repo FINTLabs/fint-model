@@ -2,7 +2,7 @@ package command
 
 import (
 	"github.com/codegangsta/cli"
-	"github.com/FINTprosjektet/fint-model/github"
+	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/package"
 	"fmt"
 )

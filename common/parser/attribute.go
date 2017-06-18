@@ -1,4 +1,4 @@
-package generator
+package parser
 
 type Attribute struct {
 	Name string

@@ -3,7 +3,7 @@ package command
 import (
 	"github.com/codegangsta/cli"
 	"fmt"
-	"github.com/FINTprosjektet/fint-model/github"
+	"github.com/FINTprosjektet/fint-model/common/github"
 )
 
 func CmdListBranches(c *cli.Context) {

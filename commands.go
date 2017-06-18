@@ -6,6 +6,7 @@ import (
 
 	"github.com/FINTprosjektet/fint-model/command"
 	"github.com/codegangsta/cli"
+	"github.com/FINTprosjektet/fint-model/generate"
 )
 
 var GlobalFlags = []cli.Flag{
@@ -27,7 +28,7 @@ var Commands = []cli.Command{
 	{
 		Name:   "generate",
 		Usage:  "",
-		Action: command.CmdGenerate,
+		Action: generate.CmdGenerate,
 		Flags:  []cli.Flag{
 			cli.StringFlag{
 				Name: "lang",

@@ -1,4 +1,4 @@
-package command
+package generate
 
 import (
 	"github.com/codegangsta/cli"
@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"github.com/FINTprosjektet/fint-model/package"
 	"strings"
-	"github.com/FINTprosjektet/fint-model/github"
-	"github.com/FINTprosjektet/fint-model/document"
-	"github.com/FINTprosjektet/fint-model/generator"
+	"github.com/FINTprosjektet/fint-model/common/github"
+	"github.com/FINTprosjektet/fint-model/common/document"
 	"io/ioutil"
+	"github.com/FINTprosjektet/fint-model/common/parser"
 )
 
 const basePath = "java/src/main/java/no/fint/model"
@@ -39,17 +39,17 @@ func generateJavaCode(tag string) {
 	document.Get(tag)
 	fmt.Println("Generating Java code:")
 	setupJavaDirStructure(tag)
-	classes := generator.GetClasses(tag)
+	classes := parser.GetClasses(tag)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
 		var class string
 
 		if len(c.Extends) > 0 {
-			class = generator.GetExtendedJavaClass(c)
+			class = GetExtendedJavaClass(c)
 		} else if c.Abstract {
-			class = generator.GetAbstractJavaClass(c)
+			class = GetAbstractJavaClass(c)
 		} else {
-			class = generator.GetJavaClass(c)
+			class = GetJavaClass(c)
 		}
 
 		path := fmt.Sprintf("%s/%s/%s.java", basePath, strings.Replace(c.Package, ".", "/", -1), c.Name)

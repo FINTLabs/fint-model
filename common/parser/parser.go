@@ -1,15 +1,14 @@
-package generator
+package parser
 
 import (
 	"github.com/antchfx/xquery/xml"
 	"fmt"
 	"strings"
 	"strconv"
-	"github.com/FINTprosjektet/fint-model/document"
+	"github.com/FINTprosjektet/fint-model/common/document"
 	"github.com/FINTprosjektet/fint-model/common/utils"
+	"github.com/FINTprosjektet/fint-model/common/config"
 )
-
-
 
 func GetClasses(tag string) []Class {
 	doc := document.Get(tag)
@@ -34,7 +33,6 @@ func GetClasses(tag string) []Class {
 
 }
 
-
 func getPackagePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 
 	var pkgs []string
@@ -51,7 +49,7 @@ func getPackagePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 
 	pkgs = utils.TrimArray(pkgs)
 	pkgs = utils.Reverse(pkgs)
-	return fmt.Sprintf("%s.%s", JAVA_PACKAGE_BASE, strings.Join(pkgs, "."))
+	return fmt.Sprintf("%s.%s", config.JAVA_PACKAGE_BASE, strings.Join(pkgs, "."))
 
 }
 
@@ -71,7 +69,7 @@ func getNamespacePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 
 	pkgs = utils.TrimArray(pkgs)
 	pkgs = utils.Reverse(pkgs)
-	return fmt.Sprintf("%s.%s", NET_PACKAGE_BASE, strings.Join(pkgs, "."))
+	return fmt.Sprintf("%s.%s", config.NET_NAMESPACE_BASE, strings.Join(pkgs, "."))
 
 }
 

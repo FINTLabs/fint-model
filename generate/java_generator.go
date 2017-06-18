@@ -1,8 +1,9 @@
-package generator
+package generate
 
 import (
 	"fmt"
 	"strings"
+	"github.com/FINTprosjektet/fint-model/common/parser"
 )
 
 const JAVA_CLASS_TEMPLATE = "package %s;\n\n" +
@@ -69,9 +70,7 @@ var JAVA_TYPE_MAP = map[string]string{
 	"double":   "double",
 }
 
-const JAVA_PACKAGE_BASE = "no.fint.model"
-
-func GetJavaClass(c Class) string {
+func GetJavaClass(c parser.Class) string {
 
 	var attributes string
 	for _, a := range c.Attributes {
@@ -87,7 +86,7 @@ func GetJavaClass(c Class) string {
 	return fmt.Sprintf(JAVA_CLASS_TEMPLATE, c.Package, c.Name, relations, attributes)
 }
 
-func GetExtendedJavaClass(c Class) string {
+func GetExtendedJavaClass(c parser.Class) string {
 
 	var attributes string
 	for _, a := range c.Attributes {
@@ -103,7 +102,7 @@ func GetExtendedJavaClass(c Class) string {
 	return fmt.Sprintf(JAVA_EXTENDED_CLASS_TEMPLATE, c.Package, c.Name, c.Extends, relations, attributes)
 }
 
-func GetAbstractJavaClass(c Class) string {
+func GetAbstractJavaClass(c parser.Class) string {
 
 	var attributes string
 	for _, a := range c.Attributes {

@@ -3,7 +3,7 @@ package document
 import (
 	"os"
 	"fmt"
-	"github.com/FINTprosjektet/fint-model/github"
+	"github.com/FINTprosjektet/fint-model/common/github"
 	"gopkg.in/iconv.v1"
 	"io/ioutil"
 	"log"
@@ -30,6 +30,7 @@ func Get(tag string) *xmlquery.Node {
 
 }
 
+// GetFile downloads the XMI file from GitHub and cleans it.
 func GetFile(tag string) {
 	fileName := github.GetXMIFile(tag)
 	cleanFile(fileName)
