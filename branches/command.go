@@ -1,4 +1,4 @@
-package command
+package branches
 
 import (
 	"github.com/codegangsta/cli"

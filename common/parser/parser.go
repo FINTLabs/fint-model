@@ -105,11 +105,11 @@ func getParentPackage(idref string, doc *xmlquery.Node) string {
 		return ""
 	}
 
-	return parent[0].SelectElement("model").SelectAttr("package")
+	return parent[0].SelectElement("model").SelectAttr("packages")
 }
 
 func getPackage(c *xmlquery.Node) string {
-	return c.SelectElement("model").SelectAttr("package")
+	return c.SelectElement("model").SelectAttr("packages")
 }
 
 func getExtends(doc *xmlquery.Node, c *xmlquery.Node) string {

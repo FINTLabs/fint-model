@@ -16,13 +16,3 @@ func DistinctPackageList(tag string) []string {
 	return utils.Distinct(p)
 }
 
-func DistinctNamespaceList(tag string) []string {
-	classes := parser.GetClasses(tag)
-
-	var p []string
-	for _, c := range classes {
-		p = append(p, c.Namespace)
-	}
-
-	return utils.Distinct(p)
-}

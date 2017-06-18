@@ -1,15 +1,15 @@
-package command
+package packages
 
 import (
 	"github.com/codegangsta/cli"
 	"github.com/FINTprosjektet/fint-model/common/github"
-	"github.com/FINTprosjektet/fint-model/package"
 	"fmt"
+	"github.com/FINTprosjektet/fint-model/common/config"
 )
 
 func CmdListPackages(c *cli.Context) {
 	var tag string
-	if c.GlobalString("tag") == "latest" {
+	if c.GlobalString("tag") == config.DEFAULT_TAG {
 		tag = github.GetLatest()
 	} else {
 		tag = c.GlobalString("tag")
@@ -17,7 +17,7 @@ func CmdListPackages(c *cli.Context) {
 
 	//document.GetFile(tag)
 
-	for _, p := range packages.DistinctPackageList(tag) {
+	for _, p := range DistinctPackageList(tag) {
 		fmt.Println(p)
 	}
 }

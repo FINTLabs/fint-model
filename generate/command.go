@@ -4,7 +4,7 @@ import (
 	"github.com/codegangsta/cli"
 	"os"
 	"fmt"
-	"github.com/FINTprosjektet/fint-model/package"
+	"github.com/FINTprosjektet/fint-model/packages"
 	"strings"
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/document"
@@ -78,7 +78,7 @@ func setupJavaDirStructure(tag string) {
 		path := fmt.Sprintf("%s/%s", basePath, strings.Replace(pkg, ".", "/", -1))
 		err := os.MkdirAll(path, 0777)
 		if err != nil {
-			fmt.Println("Unable to create package structure")
+			fmt.Println("Unable to create packages structure")
 			fmt.Println(err)
 		}
 

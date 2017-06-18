@@ -1,9 +1,8 @@
-package command
+package namespaces
 
 import (
 	"github.com/codegangsta/cli"
 	"github.com/FINTprosjektet/fint-model/common/github"
-	"github.com/FINTprosjektet/fint-model/package"
 	"fmt"
 )
 
@@ -15,7 +14,7 @@ func CmdListNamespaces(c *cli.Context) {
 		tag = c.GlobalString("tag")
 	}
 
-	for _, p := range packages.DistinctNamespaceList(tag) {
+	for _, p := range DistinctNamespaceList(tag) {
 		fmt.Println(p)
 	}
 }

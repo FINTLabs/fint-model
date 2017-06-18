@@ -1,4 +1,4 @@
-package command
+package tags
 
 import (
 	"github.com/codegangsta/cli"

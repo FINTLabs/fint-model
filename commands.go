@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/FINTprosjektet/fint-model/command"
 	"github.com/codegangsta/cli"
 	"github.com/FINTprosjektet/fint-model/generate"
+	"github.com/FINTprosjektet/fint-model/branches"
+	"github.com/FINTprosjektet/fint-model/packages"
+	"github.com/FINTprosjektet/fint-model/namespaces"
+	"github.com/FINTprosjektet/fint-model/tags"
+	"github.com/FINTprosjektet/fint-model/classes"
 )
 
 var GlobalFlags = []cli.Flag{
@@ -22,16 +26,16 @@ var Commands = []cli.Command{
 	{
 		Name:   "printClasses",
 		Usage:  "",
-		Action: command.CmdPrintClasses,
+		Action: classes.CmdPrintClasses,
 		Flags:  []cli.Flag{},
 	},
 	{
 		Name:   "generate",
 		Usage:  "",
 		Action: generate.CmdGenerate,
-		Flags:  []cli.Flag{
+		Flags: []cli.Flag{
 			cli.StringFlag{
-				Name: "lang",
+				Name:  "lang",
 				Value: "JAVA",
 				Usage: "the language to generate the code in - can be JAVA or NET",
 			},
@@ -40,25 +44,25 @@ var Commands = []cli.Command{
 	{
 		Name:   "listPackages",
 		Usage:  "list Java packages",
-		Action: command.CmdListPackages,
+		Action: packages.CmdListPackages,
 		Flags:  []cli.Flag{},
 	},
 	{
 		Name:   "listNamespaces",
 		Usage:  "list .Net namespaces",
-		Action: command.CmdListNamespaces,
+		Action: namespaces.CmdListNamespaces,
 		Flags:  []cli.Flag{},
 	},
 	{
 		Name:   "listTags",
 		Usage:  "list tags",
-		Action: command.CmdListTags,
+		Action: tags.CmdListTags,
 		Flags:  []cli.Flag{},
 	},
 	{
 		Name:   "listBranches",
 		Usage:  "list branches",
-		Action: command.CmdListBranches,
+		Action: branches.CmdListBranches,
 		Flags:  []cli.Flag{},
 	},
 }
