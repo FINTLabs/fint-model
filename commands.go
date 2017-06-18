@@ -31,7 +31,7 @@ var Commands = []cli.Command{
 	},
 	{
 		Name:   "generate",
-		Usage:  "",
+		Usage:  "generates JAVA/.NET models",
 		Action: generate.CmdGenerate,
 		Flags: []cli.Flag{
 			cli.StringFlag{
