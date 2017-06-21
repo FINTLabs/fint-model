@@ -7,7 +7,7 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/utils"
 )
 
-const JAVA_CLASS_TEMPLATE = "packages %s;\n\n" +
+const JAVA_CLASS_TEMPLATE = "package %s;\n\n" +
 	"%s\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
@@ -16,13 +16,13 @@ const JAVA_CLASS_TEMPLATE = "packages %s;\n\n" +
 	"@Data\n" +
 	"@AllArgsConstructor\n" +
 	"@NoArgsConstructor\n" +
-	"@EqualsAndHashCode(callSuper = false)\n" +
+	"@EqualsAndHashCode\n" +
 	"public class %s  {\n\n" +
 	"%s\n" + // relations
 	"%s\n" + // properties
 	"}"
 
-const JAVA_CLASS_IDENTIFIABLE_TEMPLATE = "packages %s;\n\n" +
+const JAVA_CLASS_IDENTIFIABLE_TEMPLATE = "package %s;\n\n" +
 	"%s\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
@@ -33,7 +33,7 @@ const JAVA_CLASS_IDENTIFIABLE_TEMPLATE = "packages %s;\n\n" +
 	"@Data\n" +
 	"@AllArgsConstructor\n" +
 	"@NoArgsConstructor\n" +
-	"@EqualsAndHashCode(callSuper = false)\n" +
+	"@EqualsAndHashCode\n" +
 	"public class %s implements Identifiable  {\n\n" +
 	"%s\n" + // relations
 	"%s\n\n" + // properties
@@ -44,11 +44,7 @@ const JAVA_CLASS_IDENTIFIABLE_TEMPLATE = "packages %s;\n\n" +
 	"    }\n" +
 	"}"
 
-const JAVA_ATTRIBUTE_TEMPLATE = "    private %s %s;\n"
-
-const JAVA_RELATION_TEMPLATE = "    public enum Relasjonsnavn {\n%s\n    }"
-
-const JAVA_EXTENDED_CLASS_TEMPLATE = "packages %s;\n\n" +
+const JAVA_EXTENDED_CLASS_TEMPLATE = "package %s;\n\n" +
 	"%s\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
@@ -63,7 +59,7 @@ const JAVA_EXTENDED_CLASS_TEMPLATE = "packages %s;\n\n" +
 	"%s\n" + // properties
 	"}"
 
-const JAVA_EXTENDED_CLASS_IDENTIFIABLE_TEMPLATE = "packages %s;\n\n" +
+const JAVA_EXTENDED_CLASS_IDENTIFIABLE_TEMPLATE = "package %s;\n\n" +
 	"%s\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
@@ -85,7 +81,7 @@ const JAVA_EXTENDED_CLASS_IDENTIFIABLE_TEMPLATE = "packages %s;\n\n" +
 	"    }\n" +
 	"}"
 
-const JAVA_ABSTRACT_CLASS_TEMPLATE = "packages %s;\n\n" +
+const JAVA_ABSTRACT_CLASS_TEMPLATE = "package %s;\n\n" +
 	"%s\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
@@ -94,13 +90,13 @@ const JAVA_ABSTRACT_CLASS_TEMPLATE = "packages %s;\n\n" +
 	"@Data\n" +
 	"@AllArgsConstructor\n" +
 	"@NoArgsConstructor\n" +
-	"@EqualsAndHashCode(callSuper = true)\n" +
+	"@EqualsAndHashCode\n" +
 	"public abstract class %s {\n\n" +
 	"%s\n" + // relations
 	"%s\n" + // properties
 	"}"
 
-const JAVA_ABSTRACT_EXTENDED_CLASS_TEMPLATE = "packages %s;\n\n" +
+const JAVA_ABSTRACT_EXTENDED_CLASS_TEMPLATE = "package %s;\n\n" +
 	"%s\n" +
 	"import lombok.AllArgsConstructor;\n" +
 	"import lombok.Data;\n" +
@@ -114,6 +110,10 @@ const JAVA_ABSTRACT_EXTENDED_CLASS_TEMPLATE = "packages %s;\n\n" +
 	"%s\n" + // relations
 	"%s\n" + // properties
 	"}"
+
+const JAVA_ATTRIBUTE_TEMPLATE = "    private %s %s;\n"
+
+const JAVA_RELATION_TEMPLATE = "    public enum Relasjonsnavn {\n%s\n    }"
 
 var JAVA_TYPE_MAP = map[string]string{
 	"string":   "String",
@@ -136,10 +136,10 @@ func GetJavaClass(c parser.Class, impMap map[string]parser.Import) string {
 		relations = fmt.Sprintf(JAVA_RELATION_TEMPLATE, fmt.Sprintf("        %s", strings.Join(c.Relations, ",\n        ")))
 	}
 
-	return fmt.Sprintf(JAVA_CLASS_TEMPLATE, c.Package, getImports(c, impMap), c.Name, relations, attributes)
+	return fmt.Sprintf(JAVA_CLASS_TEMPLATE, c.Package, getJavaImports(c, impMap), c.Name, relations, attributes)
 }
 
-func getImports(c parser.Class, imports map[string]parser.Import) string {
+func getJavaImports(c parser.Class, imports map[string]parser.Import) string {
 
 	attribs := c.Attributes
 	var imps []string
@@ -148,6 +148,10 @@ func getImports(c parser.Class, imports map[string]parser.Import) string {
 			imp := fmt.Sprintf("import %s;", imports[value.Type].Java)
 			imps = append(imps, imp)
 		}
+	}
+
+	if len(c.Extends) > 0 {
+		imps = append(imps, fmt.Sprintf("import %s;", imports[c.Extends].Java))
 	}
 
 
@@ -167,7 +171,7 @@ func GetJavaClassIdentifiable(c parser.Class, impMap map[string]parser.Import) s
 		relations = fmt.Sprintf(JAVA_RELATION_TEMPLATE, fmt.Sprintf("        %s", strings.Join(c.Relations, ",\n        ")))
 	}
 
-	return fmt.Sprintf(JAVA_CLASS_IDENTIFIABLE_TEMPLATE, c.Package, getImports(c, impMap), c.Name, relations, attributes)
+	return fmt.Sprintf(JAVA_CLASS_IDENTIFIABLE_TEMPLATE, c.Package, getJavaImports(c, impMap), c.Name, relations, attributes)
 }
 
 func GetExtendedJavaClass(c parser.Class, impMap map[string]parser.Import) string {
@@ -183,7 +187,7 @@ func GetExtendedJavaClass(c parser.Class, impMap map[string]parser.Import) strin
 		relations = fmt.Sprintf(JAVA_RELATION_TEMPLATE, fmt.Sprintf("        %s", strings.Join(c.Relations, ",\n        ")))
 	}
 
-	return fmt.Sprintf(JAVA_EXTENDED_CLASS_TEMPLATE, c.Package, getImports(c, impMap), c.Name, c.Extends, relations, attributes)
+	return fmt.Sprintf(JAVA_EXTENDED_CLASS_TEMPLATE, c.Package, getJavaImports(c, impMap), c.Name, c.Extends, relations, attributes)
 }
 
 func GetExtendedJavaClassIdentifiable(c parser.Class, impMap map[string]parser.Import) string {
@@ -199,7 +203,7 @@ func GetExtendedJavaClassIdentifiable(c parser.Class, impMap map[string]parser.I
 		relations = fmt.Sprintf(JAVA_RELATION_TEMPLATE, fmt.Sprintf("        %s", strings.Join(c.Relations, ",\n        ")))
 	}
 
-	return fmt.Sprintf(JAVA_EXTENDED_CLASS_IDENTIFIABLE_TEMPLATE, c.Package, getImports(c, impMap), c.Name, c.Extends, relations, attributes)
+	return fmt.Sprintf(JAVA_EXTENDED_CLASS_IDENTIFIABLE_TEMPLATE, c.Package, getJavaImports(c, impMap), c.Name, c.Extends, relations, attributes)
 }
 
 func GetAbstractJavaClass(c parser.Class, impMap map[string]parser.Import) string {
@@ -215,7 +219,23 @@ func GetAbstractJavaClass(c parser.Class, impMap map[string]parser.Import) strin
 		relations = fmt.Sprintf(JAVA_RELATION_TEMPLATE, fmt.Sprintf("        %s", strings.Join(c.Relations, ",\n        ")))
 	}
 
-	return fmt.Sprintf(JAVA_ABSTRACT_CLASS_TEMPLATE, c.Package, getImports(c, impMap), c.Name, relations, attributes)
+	return fmt.Sprintf(JAVA_ABSTRACT_CLASS_TEMPLATE, c.Package, getJavaImports(c, impMap), c.Name, relations, attributes)
+}
+
+func GetAbstractExtendedJavaClass(c parser.Class, impMap map[string]parser.Import) string {
+
+	var attributes string
+	for _, a := range c.Attributes {
+		attributes += fmt.Sprintf(JAVA_ATTRIBUTE_TEMPLATE, getJavaType(a.Type), a.Name)
+	}
+
+	relations := ""
+	if hasRelations(c.Relations) {
+
+		relations = fmt.Sprintf(JAVA_RELATION_TEMPLATE, fmt.Sprintf("        %s", strings.Join(c.Relations, ",\n        ")))
+	}
+
+	return fmt.Sprintf(JAVA_ABSTRACT_EXTENDED_CLASS_TEMPLATE, c.Package, getJavaImports(c, impMap), c.Name, c.Extends, relations, attributes)
 }
 
 func getJavaType(t string) string {
@@ -228,10 +248,4 @@ func getJavaType(t string) string {
 	}
 }
 
-func hasRelations(s []string) bool {
 
-	if len(s) > 0 {
-		return true
-	}
-	return false
-}
