@@ -9,4 +9,5 @@ type Class struct {
 	DocumentationUrl string
 	Attributes       []Attribute
 	Relations        []string
+	Identifiable     bool
 }

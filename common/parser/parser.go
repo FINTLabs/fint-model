@@ -10,10 +10,12 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/config"
 )
 
-func GetClasses(tag string) []Class {
+func GetClasses(tag string) ([]Class, map[string]Import) {
 	doc := document.Get(tag)
 
 	var classes []Class
+	packageMap := make(map[string]Import)
+
 	for _, c := range xmlquery.Find(doc, "//element[@type='Class']") {
 
 		var class Class
@@ -25,11 +27,28 @@ func GetClasses(tag string) []Class {
 		class.Relations = getAssociations(doc, c)
 		class.Package = getPackagePath(c, doc)
 		class.Namespace = getNamespacePath(c, doc)
+		class.Identifiable = identifiable(class.Attributes)
 
 		classes = append(classes, class)
+
+		imp := Import{
+			Java:   fmt.Sprintf("%s.%s",class.Package, class.Name),
+			CSharp: class.Namespace,
+		}
+		packageMap[class.Name] = imp
+	}
+	return classes, packageMap
+}
+
+func identifiable(attribs []Attribute) bool {
+
+	for _, value := range attribs {
+		if value.Type == "Identifikator" {
+			return true
+		}
 	}
 
-	return classes
+	return false
 
 }
 
@@ -97,19 +116,19 @@ func getParentPackage(idref string, doc *xmlquery.Node) string {
 	parent := xmlquery.Find(doc, xpath)
 
 	if len(parent) > 1 {
-		fmt.Printf("More than one element with idref %s", idref)
+		fmt.Printf("More than one element with idref %s\n", idref)
 		return ""
 	}
 	if len(parent) < 1 {
-		fmt.Printf("Counld not find any elements with idref %s", idref)
+		fmt.Printf("Could not find any elements with idref %s\n", idref)
 		return ""
 	}
 
-	return parent[0].SelectElement("model").SelectAttr("packages")
+	return parent[0].SelectElement("model").SelectAttr("package")
 }
 
 func getPackage(c *xmlquery.Node) string {
-	return c.SelectElement("model").SelectAttr("packages")
+	return c.SelectElement("model").SelectAttr("package")
 }
 
 func getExtends(doc *xmlquery.Node, c *xmlquery.Node) string {

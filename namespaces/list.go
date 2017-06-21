@@ -8,7 +8,7 @@ import (
 
 
 func DistinctNamespaceList(tag string) []string {
-	classes := parser.GetClasses(tag)
+	classes, _ := parser.GetClasses(tag)
 
 	var p []string
 	for _, c := range classes {

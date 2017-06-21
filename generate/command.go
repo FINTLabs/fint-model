@@ -39,17 +39,21 @@ func generateJavaCode(tag string) {
 	document.Get(tag)
 	fmt.Println("Generating Java code:")
 	setupJavaDirStructure(tag)
-	classes := parser.GetClasses(tag)
+	classes, impMap := parser.GetClasses(tag)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
 		var class string
 
-		if len(c.Extends) > 0 {
-			class = GetExtendedJavaClass(c)
+		if len(c.Extends) > 0 && c.Identifiable {
+			class = GetExtendedJavaClassIdentifiable(c, impMap)
+		} else if c.Identifiable {
+			class = GetJavaClassIdentifiable(c, impMap)
+		} else if len(c.Extends) > 0 {
+			class = GetExtendedJavaClass(c, impMap)
 		} else if c.Abstract {
-			class = GetAbstractJavaClass(c)
+			class = GetAbstractJavaClass(c, impMap)
 		} else {
-			class = GetJavaClass(c)
+			class = GetJavaClass(c, impMap)
 		}
 
 		path := fmt.Sprintf("%s/%s/%s.java", basePath, strings.Replace(c.Package, ".", "/", -1), c.Name)

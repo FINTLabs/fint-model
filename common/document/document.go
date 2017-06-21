@@ -16,7 +16,6 @@ func Get(tag string) *xmlquery.Node {
 	fileName := github.GetXMIFile(tag)
 	cleanFile(fileName)
 	defer os.Remove(fileName)
-	//fileName := "feature-141087757.xml"
 
 	f, err := os.Open(fileName)
 	if err != nil {
