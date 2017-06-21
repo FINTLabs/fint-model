@@ -12,7 +12,7 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/parser"
 )
 
-const basePath = "java/src/main/java/no/fint/model"
+const basePath = "java/src/main/java/"
 
 func CmdGenerate(c *cli.Context) {
 
