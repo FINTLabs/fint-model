@@ -5,8 +5,8 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/parser"
 )
 
-func DistinctPackageList(tag string) []string {
-	classes, _ := parser.GetClasses(tag)
+func DistinctPackageList(tag string, force bool) []string {
+	classes, _ := parser.GetClasses(tag, force)
 
 	var p []string
 	for _, c := range classes {

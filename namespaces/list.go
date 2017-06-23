@@ -7,8 +7,8 @@ import (
 
 
 
-func DistinctNamespaceList(tag string) []string {
-	classes, _ := parser.GetClasses(tag)
+func DistinctNamespaceList(tag string, force bool) []string {
+	classes, _ := parser.GetClasses(tag, force)
 
 	var p []string
 	for _, c := range classes {

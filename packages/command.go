@@ -17,7 +17,7 @@ func CmdListPackages(c *cli.Context) {
 
 	//document.GetFile(tag)
 
-	for _, p := range DistinctPackageList(tag) {
+	for _, p := range DistinctPackageList(tag, c.GlobalBool("force")) {
 		fmt.Println(p)
 	}
 }

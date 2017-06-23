@@ -22,24 +22,28 @@ func CmdGenerate(c *cli.Context) {
 	} else {
 		tag = c.GlobalString("tag")
 	}
+	force := c.GlobalBool("force")
 
 	if c.String("lang") == "JAVA" {
-		generateJavaCode(tag)
+		generateJavaCode(tag, force)
 	}
 
 	if c.String("lang") == "CS" {
-		generateCSCode(tag)
+		generateCSCode(tag, force)
 	}
 
+	if c.String("lang") == "ALL" {
+		generateCSCode(tag, force)
+		generateJavaCode(tag, force)
+	}
 }
 
-func generateJavaCode(tag string) {
+func generateJavaCode(tag string, force bool) {
 
-	//document.GetFile(tag)
-	document.Get(tag)
+	document.Get(tag, force)
 	fmt.Println("Generating Java code:")
-	setupJavaDirStructure(tag)
-	classes, _ := parser.GetClasses(tag)
+	setupJavaDirStructure(tag, force)
+	classes, _ := parser.GetClasses(tag, force)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
 		class := GetJavaClass(c)
@@ -55,12 +59,12 @@ func generateJavaCode(tag string) {
 	fmt.Println("Finish generating Java code!")
 }
 
-func generateCSCode(tag string) {
+func generateCSCode(tag string, force bool) {
 
-	document.Get(tag)
+	document.Get(tag, force)
 	fmt.Println("Generating CSharp code:")
-	setupCSDirStructure(tag)
-	classes, _ := parser.GetClasses(tag)
+	setupCSDirStructure(tag, force)
+	classes, _ := parser.GetClasses(tag, force)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.cs\n", c.Name)
 
@@ -78,7 +82,7 @@ func generateCSCode(tag string) {
 
 }
 
-func setupCSDirStructure(tag string) {
+func setupCSDirStructure(tag string, force bool) {
 	fmt.Println("  > Setup directory structure.")
 	os.RemoveAll("net")
 	err := os.MkdirAll(config.CS_BASE_PATH, 0777)
@@ -86,7 +90,7 @@ func setupCSDirStructure(tag string) {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
-	for _, ns := range namespaces.DistinctNamespaceList(tag) {
+	for _, ns := range namespaces.DistinctNamespaceList(tag, force) {
 		path := getCSPath(ns)
 		err := os.MkdirAll(path, 0777)
 		if err != nil {
@@ -104,7 +108,7 @@ func getCSPath(ns string) string {
 	return path
 }
 
-func setupJavaDirStructure(tag string) {
+func setupJavaDirStructure(tag string, force bool) {
 	fmt.Println("  > Setup directory structure.")
 	os.RemoveAll("java")
 	err := os.MkdirAll(config.JAVA_BASE_PATH, 0777)
@@ -112,7 +116,7 @@ func setupJavaDirStructure(tag string) {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
-	for _, pkg := range packages.DistinctPackageList(tag) {
+	for _, pkg := range packages.DistinctPackageList(tag, force) {
 		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
 		err := os.MkdirAll(path, 0777)
 		if err != nil {

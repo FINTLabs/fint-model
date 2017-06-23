@@ -14,7 +14,8 @@ func CmdListNamespaces(c *cli.Context) {
 		tag = c.GlobalString("tag")
 	}
 
-	for _, p := range DistinctNamespaceList(tag) {
+
+	for _, p := range DistinctNamespaceList(tag, c.GlobalBool("force")) {
 		fmt.Println(p)
 	}
 }

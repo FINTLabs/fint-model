@@ -16,9 +16,14 @@ import (
 var GlobalFlags = []cli.Flag{
 	cli.StringFlag{
 		EnvVar: "",
-		Name:   "tag",
+		Name:   "tag, t",
 		Value:  "latest",
 		Usage:  "the tag (version) of the model to generate",
+	},
+	cli.BoolFlag {
+		EnvVar: "",
+		Name:   "force, f",
+		Usage:  "force downloading XMI for GitHub.",
 	},
 }
 
@@ -35,7 +40,7 @@ var Commands = []cli.Command{
 		Action: generate.CmdGenerate,
 		Flags: []cli.Flag{
 			cli.StringFlag{
-				Name:  "lang",
+				Name:  "lang, l",
 				Value: "JAVA",
 				Usage: "the language to generate the code in - can be JAVA, CS or ALL",
 			},

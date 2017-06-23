@@ -11,8 +11,8 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/types"
 )
 
-func GetClasses(tag string) ([]types.Class, map[string]types.Import) {
-	doc := document.Get(tag)
+func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import) {
+	doc := document.Get(tag, force)
 
 	var classes []types.Class
 	packageMap := make(map[string]types.Import)
