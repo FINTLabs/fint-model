@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/parser"
+	"github.com/FINTprosjektet/fint-model/common/types"
 )
 
 func CmdPrintClasses(c *cli.Context) {
@@ -23,7 +24,7 @@ func CmdPrintClasses(c *cli.Context) {
 
 }
 
-func dumpClass(c parser.Class) {
+func dumpClass(c types.Class) {
 	fmt.Printf("Class: %s\n", c.Name)
 	fmt.Printf("  Abstract: %t\n", c.Abstract)
 	if len(c.Extends) > 0 {

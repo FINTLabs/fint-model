@@ -8,17 +8,18 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/document"
 	"github.com/FINTprosjektet/fint-model/common/utils"
 	"github.com/FINTprosjektet/fint-model/common/config"
+	"github.com/FINTprosjektet/fint-model/common/types"
 )
 
-func GetClasses(tag string) ([]Class, map[string]Import) {
+func GetClasses(tag string) ([]types.Class, map[string]types.Import) {
 	doc := document.Get(tag)
 
-	var classes []Class
-	packageMap := make(map[string]Import)
+	var classes []types.Class
+	packageMap := make(map[string]types.Import)
 
 	for _, c := range xmlquery.Find(doc, "//element[@type='Class']") {
 
-		var class Class
+		var class types.Class
 
 		class.Name = replaceNO(c.SelectAttr("name"))
 		class.Abstract = toBool(c.SelectElement("properties").SelectAttr("isAbstract"))
@@ -29,18 +30,21 @@ func GetClasses(tag string) ([]Class, map[string]Import) {
 		class.Namespace = getNamespacePath(c, doc)
 		class.Identifiable = identifiable(class.Attributes)
 
-		classes = append(classes, class)
-
-		imp := Import{
-			Java:   fmt.Sprintf("%s.%s",class.Package, class.Name),
+		imp := types.Import{
+			Java:   fmt.Sprintf("%s.%s", class.Package, class.Name),
 			CSharp: class.Namespace,
 		}
 		packageMap[class.Name] = imp
+
+		class.Imports = getImports(class, packageMap)
+		class.Using = getUsing(class, packageMap)
+
+		classes = append(classes, class)
 	}
 	return classes, packageMap
 }
 
-func identifiable(attribs []Attribute) bool {
+func identifiable(attribs []types.Attribute) bool {
 
 	for _, value := range attribs {
 		if value.Type == "Identifikator" {
@@ -49,6 +53,45 @@ func identifiable(attribs []Attribute) bool {
 	}
 
 	return false
+
+}
+
+func getImports(c types.Class, imports map[string]types.Import) []string {
+
+	attribs := c.Attributes
+	var imps []string
+	for _, value := range attribs {
+		if imports[value.Type].Java != c.Package && len(imports[value.Type].Java) > 0 {
+			//imp := fmt.Sprintf("import %s;", imports[value.Type].Java)
+			imps = append(imps, imports[value.Type].Java)
+		}
+	}
+
+	if len(c.Extends) > 0 {
+		imps = append(imps, imports[c.Extends].Java)
+	}
+
+	//return strings.Join(utils.Distinct(imps), "\n")
+	return utils.Distinct(imps)
+}
+
+func getUsing(c types.Class, imports map[string]types.Import) []string {
+
+	attribs := c.Attributes
+	var imps []string
+	for _, value := range attribs {
+		if imports[value.Type].CSharp != c.Package && len(imports[value.Type].CSharp) > 0 {
+			//imp := fmt.Sprintf("using %s;", imports[value.Type].CSharp)
+			imps = append(imps, imports[value.Type].CSharp)
+		}
+	}
+
+	if len(c.Extends) > 0 {
+		imps = append(imps, imports[c.Extends].CSharp)
+	}
+
+	//return strings.Join(utils.Distinct(imps), "\n")
+	return utils.Distinct(imps)
 
 }
 
@@ -147,11 +190,11 @@ func getExtends(doc *xmlquery.Node, c *xmlquery.Node) string {
 	return ""
 }
 
-func getAttributes(c *xmlquery.Node) []Attribute {
-	var attributes []Attribute
+func getAttributes(c *xmlquery.Node) []types.Attribute {
+	var attributes []types.Attribute
 	for _, a := range xmlquery.Find(c, "//attributes/attribute") {
 
-		attrib := Attribute{}
+		attrib := types.Attribute{}
 		attrib.Name = replaceNO(a.SelectAttr("name"))
 		attrib.Type = a.SelectElement("properties").SelectAttr("type")
 

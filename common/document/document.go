@@ -13,9 +13,11 @@ import (
 
 func Get(tag string) *xmlquery.Node {
 
-	fileName := github.GetXMIFile(tag)
-	cleanFile(fileName)
-	defer os.Remove(fileName)
+	//fileName := github.GetXMIFile(tag)
+
+	fileName := "FINT-informasjonsmodell.xml"
+	//cleanFile(fileName)
+	//defer os.Remove(fileName)
 
 	f, err := os.Open(fileName)
 	if err != nil {

@@ -31,13 +31,13 @@ var Commands = []cli.Command{
 	},
 	{
 		Name:   "generate",
-		Usage:  "generates JAVA/.NET models",
+		Usage:  "generates JAVA/CS models",
 		Action: generate.CmdGenerate,
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "lang",
 				Value: "JAVA",
-				Usage: "the language to generate the code in - can be JAVA or NET",
+				Usage: "the language to generate the code in - can be JAVA, CS or ALL",
 			},
 		},
 	},
@@ -49,7 +49,7 @@ var Commands = []cli.Command{
 	},
 	{
 		Name:   "listNamespaces",
-		Usage:  "list .Net namespaces",
+		Usage:  "list CS namespaces",
 		Action: namespaces.CmdListNamespaces,
 		Flags:  []cli.Flag{},
 	},

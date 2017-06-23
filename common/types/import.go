@@ -1,4 +1,4 @@
-package parser
+package types
 
 type Import struct {
 	Java string

@@ -1,10 +1,20 @@
 #!/usr/bin/env sh
 
-rm -rf build
-CGO_ENABLED=0 GOOS=windows go build -o ./build/windows/fint-cli.exe
-CGO_ENABLED=0 GOOS=darwin go build -o ./build/mac/fint-cli
-CGO_ENABLED=0 GOOS=linux go build -o ./build/linux/fint-cli
 
-zip build/windows.zip ./build/windows/fint-cli.exe
-zip build/linux.zip ./build/linux/fint-cli
-zip build/mac.zip ./build/mac/fint-cli
+rm -rf build
+
+mkdir build
+cd build
+mkdir windows
+mkdir mac
+mkdir linux
+
+cd ..
+
+CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -o ./build/windows/fint-model.exe
+GOOS=darwin go build -o ./build/mac/fint-model
+CGO_ENABLED=0 GOOS=linux go build -o ./build/linux/fint-model
+
+zip build/windows.zip ./build/windows/fint-model.exe
+zip build/linux.zip ./build/linux/fint-model
+zip build/mac.zip ./build/mac/fint-model

@@ -8,18 +8,16 @@ import (
 	"strings"
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/document"
-	"io/ioutil"
 	"github.com/FINTprosjektet/fint-model/common/parser"
 	"github.com/FINTprosjektet/fint-model/namespaces"
+	"io/ioutil"
+	"github.com/FINTprosjektet/fint-model/common/config"
 )
-
-const javaBasePath = "java/src/main/java/"
-const csharpBasePath = "net/"
 
 func CmdGenerate(c *cli.Context) {
 
 	var tag string
-	if c.GlobalString("tag") == "latest" {
+	if c.GlobalString("tag") == config.DEFAULT_TAG {
 		tag = github.GetLatest()
 	} else {
 		tag = c.GlobalString("tag")
@@ -29,8 +27,8 @@ func CmdGenerate(c *cli.Context) {
 		generateJavaCode(tag)
 	}
 
-	if c.String("lang") == "NET" {
-		generateNetCode(tag)
+	if c.String("lang") == "CS" {
+		generateCSCode(tag)
 	}
 
 }
@@ -41,76 +39,55 @@ func generateJavaCode(tag string) {
 	document.Get(tag)
 	fmt.Println("Generating Java code:")
 	setupJavaDirStructure(tag)
-	classes, impMap := parser.GetClasses(tag)
+	classes, _ := parser.GetClasses(tag)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
-		var class string
+		class := GetJavaClass(c)
 
-		if len(c.Extends) > 0 && c.Abstract {
-			class = GetAbstractExtendedJavaClass(c, impMap)
-		} else if len(c.Extends) > 0 && c.Identifiable {
-			class = GetExtendedJavaClassIdentifiable(c, impMap)
-		} else if c.Identifiable {
-			class = GetJavaClassIdentifiable(c, impMap)
-		} else if len(c.Extends) > 0 {
-			class = GetExtendedJavaClass(c, impMap)
-		} else if c.Abstract {
-			class = GetAbstractJavaClass(c, impMap)
-		} else {
-			class = GetJavaClass(c, impMap)
-		}
-
-		path := fmt.Sprintf("%s/%s/%s.java", javaBasePath, strings.Replace(c.Package, ".", "/", -1), c.Name)
+		path := fmt.Sprintf("%s/%s/%s.java", config.JAVA_BASE_PATH, strings.Replace(c.Package, ".", "/", -1), c.Name)
 		err := ioutil.WriteFile(path, []byte(class), 0777)
 		if err != nil {
 			fmt.Printf("Unable to write file: %s", err)
 		}
+
 	}
 
 	fmt.Println("Finish generating Java code!")
 }
 
-func generateNetCode(tag string) {
+func generateCSCode(tag string) {
 
 	document.Get(tag)
 	fmt.Println("Generating CSharp code:")
-	setupCSharpDirStructure(tag)
-	classes, impMap := parser.GetClasses(tag)
+	setupCSDirStructure(tag)
+	classes, _ := parser.GetClasses(tag)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.cs\n", c.Name)
-		var class string
 
-		if len(c.Extends) > 0 && c.Abstract {
-			class = GetExtendedAbstractCSharpClass(c, impMap)
-		} else if len(c.Extends) > 0 {
-			class = GetExtendedCSharpClass(c, impMap)
-		} else if c.Abstract {
-			class = GetAbstractCSharpClass(c, impMap)
-		} else {
-			class = GetCSharpClass(c, impMap)
-		}
+		class := GetCSClass(c)
 
-		path := fmt.Sprintf("%s/%s.cs", getCSharpPath(c.Namespace), c.Name)
+		path := fmt.Sprintf("%s/%s.cs", getCSPath(c.Namespace), c.Name)
 		err := ioutil.WriteFile(path, []byte(class), 0777)
 		if err != nil {
 			fmt.Printf("Unable to write file: %s", err)
 		}
+
 	}
 
 	fmt.Println("Finish generating CSharp code!")
 
 }
 
-func setupCSharpDirStructure(tag string) {
+func setupCSDirStructure(tag string) {
 	fmt.Println("  > Setup directory structure.")
 	os.RemoveAll("net")
-	err := os.MkdirAll(csharpBasePath, 0777)
+	err := os.MkdirAll(config.CS_BASE_PATH, 0777)
 	if err != nil {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
 	for _, ns := range namespaces.DistinctNamespaceList(tag) {
-		path := getCSharpPath(ns)
+		path := getCSPath(ns)
 		err := os.MkdirAll(path, 0777)
 		if err != nil {
 			fmt.Println("Unable to create namespace structure")
@@ -118,25 +95,25 @@ func setupCSharpDirStructure(tag string) {
 		}
 	}
 }
-func getCSharpPath(ns string) string {
+func getCSPath(ns string) string {
 	nsList := strings.Split(ns, ".")
 	projectDir := fmt.Sprintf("%s.%s.%s", nsList[0], nsList[1], nsList[2])
 	subDirs := strings.Replace(ns, projectDir, "", -1)
 	subDirs = strings.Replace(subDirs, ".", "/", -1)
-	path := fmt.Sprintf("%s/%s/%s", csharpBasePath, projectDir, subDirs)
+	path := fmt.Sprintf("%s/%s/%s", config.CS_BASE_PATH, projectDir, subDirs)
 	return path
 }
 
 func setupJavaDirStructure(tag string) {
 	fmt.Println("  > Setup directory structure.")
 	os.RemoveAll("java")
-	err := os.MkdirAll(javaBasePath, 0777)
+	err := os.MkdirAll(config.JAVA_BASE_PATH, 0777)
 	if err != nil {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
 	for _, pkg := range packages.DistinctPackageList(tag) {
-		path := fmt.Sprintf("%s/%s", javaBasePath, strings.Replace(pkg, ".", "/", -1))
+		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
 		err := os.MkdirAll(path, 0777)
 		if err != nil {
 			fmt.Println("Unable to create packages structure")

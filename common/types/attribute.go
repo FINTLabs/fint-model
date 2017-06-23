@@ -1,4 +1,4 @@
-package parser
+package types
 
 type Attribute struct {
 	Name string
