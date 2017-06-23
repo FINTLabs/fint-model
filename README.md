@@ -9,7 +9,7 @@ find it usefull, please use it!
 ## Usage
 
 ```
-fint-model
+$ fint-model
 NAME:
    fint-model - Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use, but if you find it usefull, please use it!
 
@@ -17,26 +17,28 @@ USAGE:
    fint-model [global options] command [command options] [arguments...]
 
 VERSION:
-   0.1.0
+   1.0.0
 
 AUTHOR:
    FINTProsjektet
 
 COMMANDS:
      printClasses    list classes
-     generate        generates JAVA/.NET models
+     generate        generates JAVA/CS models
      listPackages    list Java packages
-     listNamespaces  list .Net namespaces
+     listNamespaces  list CS namespaces
      listTags        list tags
      listBranches    list branches
      help, h         Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --tag value    the tag (version) of the model to generate (default: "latest")
-   --help, -h     show help
-   --version, -v  print the version
+   --tag value, -t value  the tag (version) of the model to generate (default: "latest")
+   --force, -f            force downloading XMI for GitHub.
+   --help, -h             show help
+   --version, -v          print the version
 ```
-
+The downloaded XMI file is put in the $TMPDIR/fint-model (%TEMP%/fint-model for windows). If you don't use the 
+`force` flag and the file exists in the temp directory it uses this one. 
 
 ## Install
 
