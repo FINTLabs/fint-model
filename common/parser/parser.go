@@ -40,10 +40,16 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import)
 		classes = append(classes, class)
 	}
 
+	packageMap["Date"] = types.Import{
+		Java: "java.util.Date",
+	}
+
 	for i := range classes {
 		classes[i].Imports = getImports(classes[i], packageMap)
 		classes[i].Using = getUsing(classes[i], packageMap)
 	}
+
+
 	return classes, packageMap
 }
 
@@ -64,8 +70,9 @@ func getImports(c types.Class, imports map[string]types.Import) []string {
 	attribs := c.Attributes
 	var imps []string
 	for _, value := range attribs {
-		if imports[value.Type].Java != c.Package && len(imports[value.Type].Java) > 0 {
-			imps = append(imps, imports[value.Type].Java)
+		javaType := types.GetJavaType(value.Type)
+		if imports[javaType].Java != c.Package && len(javaType) > 0 {
+			imps = append(imps, imports[javaType].Java)
 		}
 	}
 
@@ -73,7 +80,7 @@ func getImports(c types.Class, imports map[string]types.Import) []string {
 		imps = append(imps, imports[c.Extends].Java)
 	}
 
-	return utils.Distinct(imps)
+	return utils.Distinct(utils.TrimArray(imps))
 }
 
 func getUsing(c types.Class, imports map[string]types.Import) []string {
@@ -81,9 +88,9 @@ func getUsing(c types.Class, imports map[string]types.Import) []string {
 	attribs := c.Attributes
 	var imps []string
 	for _, value := range attribs {
-		if imports[value.Type].CSharp != c.Package && len(imports[value.Type].CSharp) > 0 {
-			//imp := fmt.Sprintf("using %s;", imports[value.Type].CSharp)
-			imps = append(imps, imports[value.Type].CSharp)
+		csType := types.GetCSType(value.Type)
+		if imports[csType].CSharp != c.Package && len(imports[csType].CSharp) > 0 {
+			imps = append(imps, imports[csType].CSharp)
 		}
 	}
 
@@ -91,8 +98,7 @@ func getUsing(c types.Class, imports map[string]types.Import) []string {
 		imps = append(imps, imports[c.Extends].CSharp)
 	}
 
-	//return strings.Join(utils.Distinct(imps), "\n")
-	return utils.Distinct(imps)
+	return utils.Distinct(utils.TrimArray(imps))
 
 }
 
@@ -197,7 +203,7 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 
 		attrib := types.Attribute{}
 		attrib.Name = replaceNO(a.SelectAttr("name"))
-		attrib.Type = a.SelectElement("properties").SelectAttr("type")
+		attrib.Type = replaceNO(a.SelectElement("properties").SelectAttr("type"))
 
 		attributes = append(attributes, attrib)
 	}

@@ -3,6 +3,9 @@ package generate
 
 const JAVA_CLASS_TEMPLATE = `package {{ .Package }};
 
+{{ if .Identifiable }}
+import com.fasterxml.jackson.annotation.JsonIgnore;
+{{ end }}
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +21,7 @@ import {{ $i }};
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extend {{ .Extends }} {{ end -}} {{ if .Identifiable -}} implements Identifiable {{ end -}} {
+public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extends {{ .Extends }} {{ end -}} {{ if .Identifiable -}} implements Identifiable {{ end -}} {
 
 {{- if .Relations }}
 	{{ $c := sub (len .Relations) 1 -}}

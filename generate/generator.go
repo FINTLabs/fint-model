@@ -9,8 +9,8 @@ import (
 var funcMap = template.FuncMap{
 	//"add": func(i int, ii int) int { return i + ii },
 	"sub":      func(i int, ii int) int { return i - ii },
-	"javaType": getJavaType,
-	"csType":   getCSharpType,
+	"javaType": types.GetJavaType,
+	"csType":   types.GetCSType,
 
 }
 
