@@ -17,7 +17,8 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import)
 	var classes []types.Class
 	packageMap := make(map[string]types.Import)
 
-	for _, c := range xmlquery.Find(doc, "//element[@type='Class']") {
+	classElements := xmlquery.Find(doc, "//element[@type='Class']")
+	for _, c := range classElements {
 
 		var class types.Class
 
@@ -36,10 +37,12 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import)
 		}
 		packageMap[class.Name] = imp
 
-		class.Imports = getImports(class, packageMap)
-		class.Using = getUsing(class, packageMap)
-
 		classes = append(classes, class)
+	}
+
+	for i := range classes {
+		classes[i].Imports = getImports(classes[i], packageMap)
+		classes[i].Using = getUsing(classes[i], packageMap)
 	}
 	return classes, packageMap
 }
@@ -62,7 +65,6 @@ func getImports(c types.Class, imports map[string]types.Import) []string {
 	var imps []string
 	for _, value := range attribs {
 		if imports[value.Type].Java != c.Package && len(imports[value.Type].Java) > 0 {
-			//imp := fmt.Sprintf("import %s;", imports[value.Type].Java)
 			imps = append(imps, imports[value.Type].Java)
 		}
 	}
@@ -71,7 +73,6 @@ func getImports(c types.Class, imports map[string]types.Import) []string {
 		imps = append(imps, imports[c.Extends].Java)
 	}
 
-	//return strings.Join(utils.Distinct(imps), "\n")
 	return utils.Distinct(imps)
 }
 

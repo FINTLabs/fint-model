@@ -1,7 +1,6 @@
 package generate
 
-const CS_CLASS_TEMPLATE = `
-{{ if .Using }}
+const CS_CLASS_TEMPLATE = `{{ if .Using }}
 {{ range $u := .Using }}
 using {{ $u }};
 {{- end -}}

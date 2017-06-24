@@ -1,8 +1,7 @@
 package generate
 
 
-const JAVA_CLASS_TEMPLATE = `
-package {{ .Package }};
+const JAVA_CLASS_TEMPLATE = `package {{ .Package }};
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
