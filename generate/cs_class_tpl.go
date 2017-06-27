@@ -1,6 +1,7 @@
 package generate
 
-const CS_CLASS_TEMPLATE = `{{ if .Using }}
+const CS_CLASS_TEMPLATE = `using System;
+{{ if .Using }}
 {{ range $u := .Using }}
 using {{ $u }};
 {{- end -}}
@@ -8,7 +9,7 @@ using {{ $u }};
 
 namespace {{ .Namespace }}
 {
-	public class {{ .Name }}
+	public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} : {{ .Extends }} {{ end -}}
 	{
 		{{- if .Relations }}
 		{{ $c := sub (len .Relations) 1 -}}
@@ -21,7 +22,7 @@ namespace {{ .Namespace }}
         {{ end }}
 	{{ if .Attributes }}
 		{{ range $att := .Attributes -}}
-			public {{ $att.Type}} {{ $att.Name }} { get; set; }
+			public {{ csType $att.Type}} {{ $att.Name }} { get; set; }
 		{{ end -}}
 	{{ end }}
 	}
