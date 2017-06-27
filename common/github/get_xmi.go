@@ -7,10 +7,10 @@ import (
 	"os"
 	"io"
 	"github.com/FINTprosjektet/fint-model/common/utils"
+	"io/ioutil"
+	"golang.org/x/text/encoding/charmap"
 	"log"
 	"strings"
-	"io/ioutil"
-	"gopkg.in/iconv.v1"
 )
 
 func GetXMIFile(tag string, force bool) string {
@@ -92,17 +92,14 @@ func cleanFile(fileName string) {
 }
 
 func toUtf8(fileName string) {
-
-	cd, err := iconv.Open("utf-8", "windows-1252")
+	f, err := os.Open(fileName)
 	if err != nil {
-		fmt.Println("iconv.Open failed!")
-		return
+		fmt.Printf("Error opening %s (%s)", fileName, err)
+		os.Exit(2)
 	}
-	defer cd.Close()
+	defer f.Close()
 
-	input, err := os.Open(fileName)
-	bufSize := 0 // default if zero
-	r := iconv.NewReader(cd, input, bufSize)
+	r := charmap.Windows1252.NewDecoder().Reader(f)
 
 	content, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -114,5 +111,5 @@ func toUtf8(fileName string) {
 	if err != nil {
 		fmt.Println("\nio.Copy failed:", err)
 	}
-}
 
+}
