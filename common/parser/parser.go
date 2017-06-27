@@ -16,6 +16,7 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import)
 
 	var classes []types.Class
 	packageMap := make(map[string]types.Import)
+	classMap := make(map[string]types.Class)
 
 	classElements := xmlquery.Find(doc, "//element[@type='Class']")
 	for _, c := range classElements {
@@ -38,6 +39,7 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import)
 		packageMap[class.Name] = imp
 
 		classes = append(classes, class)
+		classMap[class.Name] = class
 	}
 
 	packageMap["Date"] = types.Import{
@@ -47,10 +49,20 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import)
 	for i := range classes {
 		classes[i].Imports = getImports(classes[i], packageMap)
 		classes[i].Using = getUsing(classes[i], packageMap)
+		classes[i].Identifiable = identifiableFromExtends(classes[i], classMap)
 	}
 
 
 	return classes, packageMap
+}
+
+func identifiableFromExtends(class types.Class, classMap map[string]types.Class) bool {
+	if len(class.Extends) > 0 && !class.Identifiable {
+		if classMap[class.Extends].Identifiable {
+			return true
+		}
+	}
+	return false
 }
 
 func identifiable(attribs []types.Attribute) bool {
