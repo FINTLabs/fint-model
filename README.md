@@ -8,7 +8,7 @@ find it usefull, please use it!
 
 ## Usage
 
-```
+```bash
 $ fint-model
 NAME:
    fint-model - Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use, but if you find it usefull, please use it!
@@ -37,6 +37,7 @@ GLOBAL OPTIONS:
    --help, -h             show help
    --version, -v          print the version
 ```
+
 The downloaded XMI file is put in the $TMPDIR/fint-model (%TEMP%/fint-model for windows). If you don't use the 
 `force` flag and the file exists in the temp directory it uses this one. 
 
@@ -51,11 +52,9 @@ Precompiled binaries can be downloaded [here](https://github.com/FINTprosjektet/
 To install, use `go get`:
 
 ```bash
-$ go get -d github.com/FINTProsjektet/fint-model
-$ go install github.com/FINTProsjektet/fint-model
+go get -d github.com/FINTprosjektet/fint-model
+go install github.com/FINTprosjektet/fint-model
 ```
-
-
 
 ## Author
 
