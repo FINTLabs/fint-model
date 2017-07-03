@@ -1,6 +1,6 @@
 package types
 
 type Import struct {
-	Java string
+	Java   string
 	CSharp string
 }

@@ -17,4 +17,3 @@ func GetJavaType(t string) string {
 		return t
 	}
 }
-

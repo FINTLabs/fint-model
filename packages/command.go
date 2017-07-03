@@ -1,10 +1,10 @@
 package packages
 
 import (
-	"github.com/codegangsta/cli"
-	"github.com/FINTprosjektet/fint-model/common/github"
 	"fmt"
 	"github.com/FINTprosjektet/fint-model/common/config"
+	"github.com/FINTprosjektet/fint-model/common/github"
+	"github.com/codegangsta/cli"
 )
 
 func CmdListPackages(c *cli.Context) {

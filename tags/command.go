@@ -1,9 +1,9 @@
 package tags
 
 import (
-	"github.com/codegangsta/cli"
 	"fmt"
 	"github.com/FINTprosjektet/fint-model/common/github"
+	"github.com/codegangsta/cli"
 )
 
 func CmdListTags(c *cli.Context) {

@@ -1,5 +1,4 @@
 package github
 
 const GITHUB_OWNER = "FINTprosjektet"
-const GITHUB_REPO  = "fint-informasjonsmodell"
-
+const GITHUB_REPO = "fint-informasjonsmodell"

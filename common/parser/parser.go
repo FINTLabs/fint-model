@@ -1,14 +1,14 @@
 package parser
 
 import (
-	"github.com/antchfx/xquery/xml"
 	"fmt"
-	"strings"
-	"strconv"
-	"github.com/FINTprosjektet/fint-model/common/document"
-	"github.com/FINTprosjektet/fint-model/common/utils"
 	"github.com/FINTprosjektet/fint-model/common/config"
+	"github.com/FINTprosjektet/fint-model/common/document"
 	"github.com/FINTprosjektet/fint-model/common/types"
+	"github.com/FINTprosjektet/fint-model/common/utils"
+	"github.com/antchfx/xquery/xml"
+	"strconv"
+	"strings"
 )
 
 func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import) {
@@ -27,7 +27,7 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import)
 		class.Abstract = toBool(c.SelectElement("properties").SelectAttr("isAbstract"))
 		class.Extends = getExtends(doc, c)
 		class.Attributes = getAttributes(c)
-		class.Relations = getAssociations(doc, c)
+		class.Relations = getRelations(doc, c)
 		class.Package = getPackagePath(c, doc)
 		class.Namespace = getNamespacePath(c, doc)
 		class.Identifiable = identifiable(class.Attributes)
@@ -51,7 +51,6 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import)
 		classes[i].Using = getUsing(classes[i], packageMap)
 		classes[i].Identifiable = identifiableFromExtends(classes[i], classMap)
 	}
-
 
 	return classes, packageMap
 }
@@ -223,6 +222,42 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 	return attributes
 }
 
+func getRelations(doc *xmlquery.Node, c *xmlquery.Node) []string {
+	var assocs []string
+	isAbstract := toBool(c.SelectElement("properties").SelectAttr("isAbstract"))
+	if !isAbstract {
+		assocs = getAssociations(doc, c)
+		assocs = append(assocs, getRecursivelyAssociationsFromExtends(doc, c)...)
+	}
+
+	return assocs
+}
+
+func getRecursivelyAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) []string {
+	var assocs []string
+	extAssocs, extends := getAssociationsFromExtends(doc, c)
+	assocs = append(assocs, extAssocs...)
+	for {
+		if extends == nil {
+			break
+		}
+		extAssocs, extends = getAssociationsFromExtends(doc, extends)
+		assocs = append(assocs, extAssocs...)
+	}
+	return assocs
+}
+
+func getAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) ([]string, *xmlquery.Node) {
+	var assocs []string
+	extends := xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source/model[@name='%s']/../../target/model[@name]", c.SelectAttr("name")))
+	if len(extends) == 1 {
+		assocs = append(assocs, getAssociations(doc, extends[0])...)
+		return assocs, extends[0]
+	}
+
+	return assocs, nil
+}
+
 func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []string {
 	var assocs []string
 	for _, rr := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source/model[@name='%s']/../../target/role", c.SelectAttr("name"))) {
@@ -235,7 +270,6 @@ func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []string {
 			assocs = append(assocs, strings.ToUpper(replaceNO(rl.SelectAttr("name"))))
 		}
 	}
-
 	return assocs
 }
 

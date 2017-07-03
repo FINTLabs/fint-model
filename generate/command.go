@@ -1,17 +1,17 @@
 package generate
 
 import (
-	"github.com/codegangsta/cli"
-	"os"
 	"fmt"
-	"github.com/FINTprosjektet/fint-model/packages"
-	"strings"
-	"github.com/FINTprosjektet/fint-model/common/github"
+	"github.com/FINTprosjektet/fint-model/common/config"
 	"github.com/FINTprosjektet/fint-model/common/document"
+	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/parser"
 	"github.com/FINTprosjektet/fint-model/namespaces"
+	"github.com/FINTprosjektet/fint-model/packages"
+	"github.com/codegangsta/cli"
 	"io/ioutil"
-	"github.com/FINTprosjektet/fint-model/common/config"
+	"os"
+	"strings"
 )
 
 func CmdGenerate(c *cli.Context) {

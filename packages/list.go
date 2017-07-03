@@ -1,8 +1,8 @@
 package packages
 
 import (
-	"github.com/FINTprosjektet/fint-model/common/utils"
 	"github.com/FINTprosjektet/fint-model/common/parser"
+	"github.com/FINTprosjektet/fint-model/common/utils"
 )
 
 func DistinctPackageList(tag string, force bool) []string {
@@ -15,4 +15,3 @@ func DistinctPackageList(tag string, force bool) []string {
 
 	return utils.Distinct(p)
 }
-

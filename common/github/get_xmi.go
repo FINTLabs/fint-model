@@ -1,15 +1,15 @@
 package github
 
 import (
-	"golang.org/x/net/context"
-	"github.com/google/go-github/github"
 	"fmt"
-	"os"
-	"io"
 	"github.com/FINTprosjektet/fint-model/common/utils"
-	"io/ioutil"
+	"github.com/google/go-github/github"
+	"golang.org/x/net/context"
 	"golang.org/x/text/encoding/charmap"
+	"io"
+	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 )
 

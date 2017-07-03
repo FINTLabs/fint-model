@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/codegangsta/cli"
-	"github.com/FINTprosjektet/fint-model/generate"
 	"github.com/FINTprosjektet/fint-model/branches"
-	"github.com/FINTprosjektet/fint-model/packages"
-	"github.com/FINTprosjektet/fint-model/namespaces"
-	"github.com/FINTprosjektet/fint-model/tags"
 	"github.com/FINTprosjektet/fint-model/classes"
+	"github.com/FINTprosjektet/fint-model/generate"
+	"github.com/FINTprosjektet/fint-model/namespaces"
+	"github.com/FINTprosjektet/fint-model/packages"
+	"github.com/FINTprosjektet/fint-model/tags"
+	"github.com/codegangsta/cli"
 )
 
 var GlobalFlags = []cli.Flag{
@@ -20,7 +20,7 @@ var GlobalFlags = []cli.Flag{
 		Value:  "latest",
 		Usage:  "the tag (version) of the model to generate",
 	},
-	cli.BoolFlag {
+	cli.BoolFlag{
 		EnvVar: "",
 		Name:   "force, f",
 		Usage:  "force downloading XMI for GitHub.",

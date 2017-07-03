@@ -1,11 +1,11 @@
 package classes
 
 import (
-	"github.com/codegangsta/cli"
 	"fmt"
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/parser"
 	"github.com/FINTprosjektet/fint-model/common/types"
+	"github.com/codegangsta/cli"
 )
 
 func CmdPrintClasses(c *cli.Context) {

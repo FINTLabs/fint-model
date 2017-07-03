@@ -1,6 +1,5 @@
 package generate
 
-
 const JAVA_CLASS_TEMPLATE = `package {{ .Package }};
 
 {{ if .Identifiable }}

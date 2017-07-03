@@ -1,9 +1,9 @@
 package generate
 
 import (
-	"text/template"
 	"bytes"
 	"github.com/FINTprosjektet/fint-model/common/types"
+	"text/template"
 )
 
 var funcMap = template.FuncMap{
@@ -11,7 +11,6 @@ var funcMap = template.FuncMap{
 	"sub":      func(i int, ii int) int { return i - ii },
 	"javaType": types.GetJavaType,
 	"csType":   types.GetCSType,
-
 }
 
 func GetJavaClass(c types.Class) string {

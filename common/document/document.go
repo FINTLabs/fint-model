@@ -1,10 +1,10 @@
 package document
 
 import (
-	"os"
 	"fmt"
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/antchfx/xquery/xml"
+	"os"
 )
 
 func Get(tag string, force bool) *xmlquery.Node {

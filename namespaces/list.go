@@ -1,11 +1,9 @@
 package namespaces
 
 import (
-	"github.com/FINTprosjektet/fint-model/common/utils"
 	"github.com/FINTprosjektet/fint-model/common/parser"
+	"github.com/FINTprosjektet/fint-model/common/utils"
 )
-
-
 
 func DistinctNamespaceList(tag string, force bool) []string {
 	classes, _ := parser.GetClasses(tag, force)

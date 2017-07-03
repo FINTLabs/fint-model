@@ -1,9 +1,9 @@
 package github
 
 import (
+	"fmt"
 	"github.com/google/go-github/github"
 	"golang.org/x/net/context"
-	"fmt"
 )
 
 func GetBranchList() []string {
