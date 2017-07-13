@@ -20,7 +20,7 @@ public enum {{ .Name }} {
      */
     public static List<String> getActions() {
         return Arrays.asList(
-                Arrays.stream(PersonalActions.class.getEnumConstants()).map(Enum::name).toArray(String[]::new)
+                Arrays.stream({{ .Name }}.class.getEnumConstants()).map(Enum::name).toArray(String[]::new)
         );
     }
 

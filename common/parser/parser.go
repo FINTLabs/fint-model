@@ -58,7 +58,6 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import,
 }
 
 func identifiableFromExtends(class types.Class, classMap map[string]types.Class) bool {
-	fmt.Println()
 	if class.Identifiable {
 		return true
 	}

@@ -11,10 +11,11 @@ import (
 	"log"
 	"os"
 	"strings"
+	"github.com/mitchellh/go-homedir"
 )
 
 func GetXMIFile(tag string, force bool) string {
-
+	fmt.Println("GetXMIFile")
 	outFileName := getFilePath(tag)
 
 	if force {
@@ -47,9 +48,19 @@ func downloadFile(tag string, outFileName string) {
 }
 
 func getFilePath(tag string) string {
-	tmpDir := os.TempDir()
-	dir := fmt.Sprintf("%s/fint-model", tmpDir)
-	os.Mkdir(dir, 0777)
+	homeDir, err := homedir.Dir()
+	if err != nil {
+		fmt.Println("Unable to get homedir.")
+		os.Exit(2)
+	}
+	dir := fmt.Sprintf("%s/.fint-model/.cache", homeDir)
+	err = os.MkdirAll(dir, 0777)
+
+	if err != nil {
+		fmt.Println("Unable to create .fint-model")
+		os.Exit(2)
+	}
+
 	outFileName := fmt.Sprintf("%s/%s.xml", dir, tag)
 
 	return outFileName
