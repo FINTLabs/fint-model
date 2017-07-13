@@ -8,10 +8,10 @@ find it usefull, please use it!
 
 ## Usage
 
-```shell
+```
 $ fint-model
 NAME:
-   fint-model - Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use, `
+   fint-model - Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use,
    but if you find it usefull, please use it!
 
 USAGE:
