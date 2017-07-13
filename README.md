@@ -3,15 +3,16 @@
 
 
 ## Description
-Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use, but if you 
+Generates `Java` and `C#` models from EA XMI export. This utility is mainly for internal FINT use, but if you 
 find it usefull, please use it!
 
 ## Usage
 
-```bash
+```shell
 $ fint-model
 NAME:
-   fint-model - Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use, but if you find it usefull, please use it!
+   fint-model - Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use, `
+   but if you find it usefull, please use it!
 
 USAGE:
    fint-model [global options] command [command options] [arguments...]
@@ -38,7 +39,7 @@ GLOBAL OPTIONS:
    --version, -v          print the version
 ```
 
-The downloaded XMI file is put in the $TMPDIR/fint-model (%TEMP%/fint-model for windows). If you don't use the 
+The downloaded XMI file is put in the `$HOME/.fint-model/.cache. If you don't use the 
 `force` flag and the file exists in the temp directory it uses this one. 
 
 ## Install
