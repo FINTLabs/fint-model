@@ -16,7 +16,7 @@ func CmdPrintClasses(c *cli.Context) {
 		tag = c.GlobalString("tag")
 	}
 
-	clazzes, _ := parser.GetClasses(tag, c.GlobalBool("force"))
+	clazzes, _, _:= parser.GetClasses(tag, c.GlobalBool("force"))
 
 	for _, c := range clazzes {
 		dumpClass(c)
@@ -27,6 +27,7 @@ func CmdPrintClasses(c *cli.Context) {
 func dumpClass(c types.Class) {
 	fmt.Printf("Class: %s\n", c.Name)
 	fmt.Printf("  Abstract: %t\n", c.Abstract)
+	fmt.Printf("  Identifiable: %t\n", c.Identifiable)
 	if len(c.Extends) > 0 {
 		fmt.Printf("  Extends: %s\n", c.Extends)
 	}

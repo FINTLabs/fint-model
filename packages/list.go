@@ -6,7 +6,7 @@ import (
 )
 
 func DistinctPackageList(tag string, force bool) []string {
-	classes, _ := parser.GetClasses(tag, force)
+	classes, _, _ := parser.GetClasses(tag, force)
 
 	var p []string
 	for _, c := range classes {

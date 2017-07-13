@@ -11,12 +11,13 @@ import (
 	"strings"
 )
 
-func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import) {
+func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import, map[string][]types.Class) {
 	doc := document.Get(tag, force)
 
 	var classes []types.Class
 	packageMap := make(map[string]types.Import)
 	classMap := make(map[string]types.Class)
+	packageClassMap := make(map[string][]types.Class)
 
 	classElements := xmlquery.Find(doc, "//element[@type='Class']")
 	for _, c := range classElements {
@@ -50,13 +51,18 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import)
 		classes[i].Imports = getImports(classes[i], packageMap)
 		classes[i].Using = getUsing(classes[i], packageMap)
 		classes[i].Identifiable = identifiableFromExtends(classes[i], classMap)
+		packageClassMap[classes[i].Package] = append(packageClassMap[classes[i].Package], classes[i])
 	}
 
-	return classes, packageMap
+	return classes, packageMap, packageClassMap
 }
 
 func identifiableFromExtends(class types.Class, classMap map[string]types.Class) bool {
-	if len(class.Extends) > 0 && !class.Identifiable {
+	fmt.Println()
+	if class.Identifiable {
+		return true
+	}
+	if len(class.Extends) > 0 {
 		if classMap[class.Extends].Identifiable {
 			return true
 		}

@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"github.com/FINTprosjektet/fint-model/common/types"
 )
 
 func CmdGenerate(c *cli.Context) {
@@ -43,7 +44,7 @@ func generateJavaCode(tag string, force bool) {
 	document.Get(tag, force)
 	fmt.Println("Generating Java code:")
 	setupJavaDirStructure(tag, force)
-	classes, _ := parser.GetClasses(tag, force)
+	classes, _, packageClassMap := parser.GetClasses(tag, force)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
 		class := GetJavaClass(c)
@@ -56,7 +57,35 @@ func generateJavaCode(tag string, force bool) {
 
 	}
 
+	for p, cl := range packageClassMap {
+		action := getAction(p, cl)
+		fmt.Printf("  > Creating action: %s.java\n", action.Name)
+		actionEnum := GetJavaActionEnum(action)
+		path := fmt.Sprintf("%s/%s/%s.java", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1), action.Name)
+		err := ioutil.WriteFile(path, []byte(actionEnum), 0777)
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
+		}
+
+	}
+
 	fmt.Println("Finish generating Java code!")
+}
+func getAction(p string, cl []types.Class) types.Action {
+	var action types.Action
+
+	packageList := strings.Split(p, ".")
+	pkg := packageList[len(packageList)-1]
+	action.Name = fmt.Sprintf("%sActions", strings.Title(pkg))
+
+	action.Package = p
+
+	for _, c := range cl {
+		if c.Identifiable && !c.Abstract {
+			action.Classes = append(action.Classes, strings.ToUpper(c.Name))
+		}
+	}
+	return action
 }
 
 func generateCSCode(tag string, force bool) {
@@ -64,7 +93,7 @@ func generateCSCode(tag string, force bool) {
 	document.Get(tag, force)
 	fmt.Println("Generating CSharp code:")
 	setupCSDirStructure(tag, force)
-	classes, _ := parser.GetClasses(tag, force)
+	classes, _, _ := parser.GetClasses(tag, force)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.cs\n", c.Name)
 
