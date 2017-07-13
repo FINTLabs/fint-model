@@ -40,7 +40,7 @@ GLOBAL OPTIONS:
 ```
 
 The downloaded XMI file is put in the `$HOME/.fint-model/.cache`. If you don't use the 
-`force` flag and the file exists in the temp directory it uses this one. 
+`force` flag and the file exists in the cache directory it uses this one. 
 
 ## Install
 
