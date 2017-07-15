@@ -16,7 +16,7 @@ func CmdPrintClasses(c *cli.Context) {
 		tag = c.GlobalString("tag")
 	}
 
-	clazzes, _, _:= parser.GetClasses(tag, c.GlobalBool("force"))
+	clazzes, _, _, _:= parser.GetClasses(tag, c.GlobalBool("force"))
 
 	for _, c := range clazzes {
 		dumpClass(c)

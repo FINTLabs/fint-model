@@ -11,13 +11,14 @@ import (
 	"strings"
 )
 
-func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import, map[string][]types.Class) {
+func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import, map[string][]types.Class, map[string][]types.Class) {
 	doc := document.Get(tag, force)
 
 	var classes []types.Class
 	packageMap := make(map[string]types.Import)
 	classMap := make(map[string]types.Class)
-	packageClassMap := make(map[string][]types.Class)
+	javaPackageClassMap := make(map[string]	[]types.Class)
+	csPackageClassMap := make(map[string]	[]types.Class)
 
 	classElements := xmlquery.Find(doc, "//element[@type='Class']")
 	for _, c := range classElements {
@@ -51,10 +52,11 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import,
 		classes[i].Imports = getImports(classes[i], packageMap)
 		classes[i].Using = getUsing(classes[i], packageMap)
 		classes[i].Identifiable = identifiableFromExtends(classes[i], classMap)
-		packageClassMap[classes[i].Package] = append(packageClassMap[classes[i].Package], classes[i])
+		javaPackageClassMap[classes[i].Package] = append(javaPackageClassMap[classes[i].Package], classes[i])
+		csPackageClassMap[classes[i].Namespace] = append(csPackageClassMap[classes[i].Namespace], classes[i])
 	}
 
-	return classes, packageMap, packageClassMap
+	return classes, packageMap, javaPackageClassMap, csPackageClassMap
 }
 
 func identifiableFromExtends(class types.Class, classMap map[string]types.Class) bool {

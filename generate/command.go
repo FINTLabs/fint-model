@@ -44,7 +44,7 @@ func generateJavaCode(tag string, force bool) {
 	document.Get(tag, force)
 	fmt.Println("Generating Java code:")
 	setupJavaDirStructure(tag, force)
-	classes, _, packageClassMap := parser.GetClasses(tag, force)
+	classes, _, packageClassMap, _ := parser.GetClasses(tag, force)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
 		class := GetJavaClass(c)
@@ -79,6 +79,7 @@ func getAction(p string, cl []types.Class) types.Action {
 	action.Name = fmt.Sprintf("%sActions", strings.Title(pkg))
 
 	action.Package = p
+	action.Namespace = p
 
 	for _, c := range cl {
 		if c.Identifiable && !c.Abstract {
@@ -93,7 +94,7 @@ func generateCSCode(tag string, force bool) {
 	document.Get(tag, force)
 	fmt.Println("Generating CSharp code:")
 	setupCSDirStructure(tag, force)
-	classes, _, _ := parser.GetClasses(tag, force)
+	classes, _, _, packageClassMap := parser.GetClasses(tag, force)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.cs\n", c.Name)
 
@@ -101,6 +102,18 @@ func generateCSCode(tag string, force bool) {
 
 		path := fmt.Sprintf("%s/%s.cs", getCSPath(c.Namespace), c.Name)
 		err := ioutil.WriteFile(path, []byte(class), 0777)
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
+		}
+
+	}
+
+	for p, cl := range packageClassMap {
+		action := getAction(p, cl)
+		fmt.Printf("  > Creating action: %s.cs\n", action.Name)
+		actionEnum := GetCSActionEnum(action)
+		path := fmt.Sprintf("%s/%s.cs", getCSPath(p), action.Name)
+		err := ioutil.WriteFile(path, []byte(actionEnum), 0777)
 		if err != nil {
 			fmt.Printf("Unable to write file: %s", err)
 		}

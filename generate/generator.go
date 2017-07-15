@@ -21,6 +21,10 @@ func GetJavaActionEnum(a types.Action) string  {
 	return getActionEnum(a, JAVA_ACTION_ENUM_TEMPLATE)
 }
 
+func GetCSActionEnum(a types.Action) string  {
+	return getActionEnum(a, CS_ACTION_ENUM_TEMPLATE)
+}
+
 func GetCSClass(c types.Class) string {
 	return getClass(c, CS_CLASS_TEMPLATE)
 }
