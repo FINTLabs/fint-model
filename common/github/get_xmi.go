@@ -15,7 +15,6 @@ import (
 )
 
 func GetXMIFile(tag string, force bool) string {
-	fmt.Println("GetXMIFile")
 	outFileName := getFilePath(tag)
 
 	if force {
