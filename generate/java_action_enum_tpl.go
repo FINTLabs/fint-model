@@ -12,6 +12,8 @@ public enum {{ .Name }} {
 	GET_ALL_{{ $class }},
 	UPDATE_{{ $class }}{{ if ne $i $c }},{{ end }}
 	{{- end }}
+	;
+
 
     /**
      * Gets a list of all enums as string
