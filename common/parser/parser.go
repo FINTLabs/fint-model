@@ -286,7 +286,7 @@ func replaceNO(s string) string {
 	r := strings.Replace(s, "æ", "a", -1)
 	r = strings.Replace(r, "ø", "o", -1)
 	r = strings.Replace(r, "å", "a", -1)
-	r = strings.Replace(s, "Æ", "A", -1)
+	r = strings.Replace(r, "Æ", "A", -1)
 	r = strings.Replace(r, "Ø", "O", -1)
 	r = strings.Replace(r, "Å", "A", -1)
 	return r
