@@ -2,13 +2,13 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/FINTprosjektet/fint-model/common/config"
 	"github.com/FINTprosjektet/fint-model/common/document"
 	"github.com/FINTprosjektet/fint-model/common/types"
 	"github.com/FINTprosjektet/fint-model/common/utils"
-	"github.com/antchfx/xquery/xml"
-	"strconv"
-	"strings"
 )
 
 func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import, map[string][]types.Class, map[string][]types.Class) {
@@ -17,8 +17,8 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import,
 	var classes []types.Class
 	packageMap := make(map[string]types.Import)
 	classMap := make(map[string]types.Class)
-	javaPackageClassMap := make(map[string]	[]types.Class)
-	csPackageClassMap := make(map[string]	[]types.Class)
+	javaPackageClassMap := make(map[string][]types.Class)
+	csPackageClassMap := make(map[string][]types.Class)
 
 	classElements := xmlquery.Find(doc, "//element[@type='Class']")
 	for _, c := range classElements {
@@ -285,7 +285,9 @@ func replaceNO(s string) string {
 	r := strings.Replace(s, "æ", "a", -1)
 	r = strings.Replace(r, "ø", "o", -1)
 	r = strings.Replace(r, "å", "a", -1)
-
+	r = strings.Replace(s, "Æ", "A", -1)
+	r = strings.Replace(r, "Ø", "O", -1)
+	r = strings.Replace(r, "Å", "A", -1)
 	return r
 }
 
