@@ -9,6 +9,7 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/document"
 	"github.com/FINTprosjektet/fint-model/common/types"
 	"github.com/FINTprosjektet/fint-model/common/utils"
+	"github.com/antchfx/xquery/xml"
 )
 
 func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import, map[string][]types.Class, map[string][]types.Class) {
