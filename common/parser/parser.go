@@ -241,6 +241,7 @@ func getRelations(doc *xmlquery.Node, c *xmlquery.Node) []string {
 	return assocs
 }
 
+// TODO: This is actualy iterativ and not recursive. This should probably be fixed in the future.
 func getRecursivelyAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) []string {
 	var assocs []string
 	extAssocs, extends := getAssociationsFromExtends(doc, c)
@@ -257,7 +258,7 @@ func getRecursivelyAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node)
 
 func getAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) ([]string, *xmlquery.Node) {
 	var assocs []string
-	extends := xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source/model[@name='%s']/../../target/model[@name]", c.SelectAttr("name")))
+	extends := xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source[@idref='%s']/../target", c.SelectAttr("idref")))
 	if len(extends) == 1 {
 		assocs = append(assocs, getAssociations(doc, extends[0])...)
 		return assocs, extends[0]
@@ -268,12 +269,12 @@ func getAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) ([]string,
 
 func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []string {
 	var assocs []string
-	for _, rr := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source/model[@name='%s']/../../target/role", c.SelectAttr("name"))) {
+	for _, rr := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role", c.SelectAttr("idref"))) {
 		if len(rr.SelectAttr("name")) > 0 {
 			assocs = append(assocs, strings.ToUpper(replaceNO(rr.SelectAttr("name"))))
 		}
 	}
-	for _, rl := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target/model[@name='%s']/../../source/role", c.SelectAttr("name"))) {
+	for _, rl := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role", c.SelectAttr("idref"))) {
 		if len(rl.SelectAttr("name")) > 0 {
 			assocs = append(assocs, strings.ToUpper(replaceNO(rl.SelectAttr("name"))))
 		}
