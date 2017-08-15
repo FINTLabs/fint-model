@@ -203,7 +203,7 @@ func getPackage(c *xmlquery.Node) string {
 func getExtends(doc *xmlquery.Node, c *xmlquery.Node) string {
 
 	var extends []string
-	for _, rr := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source/model[@name='%s']/../../target/model[@name]", c.SelectAttr("name"))) {
+	for _, rr := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source[@idref='%s']/../target/model[@name]", c.SelectAttr("idref"))) {
 		if len(rr.SelectAttr("name")) > 0 {
 			extends = append(extends, replaceNO(rr.SelectAttr("name")))
 		}
