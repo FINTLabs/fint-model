@@ -7,12 +7,12 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/parser"
 	"github.com/FINTprosjektet/fint-model/namespaces"
-	"github.com/FINTprosjektet/fint-model/packages"
 	"github.com/codegangsta/cli"
 	"io/ioutil"
 	"os"
 	"strings"
 	"github.com/FINTprosjektet/fint-model/common/types"
+	"github.com/FINTprosjektet/fint-model/packages"
 )
 
 func CmdGenerate(c *cli.Context) {
@@ -50,7 +50,7 @@ func generateJavaCode(tag string, force bool) {
 		class := GetJavaClass(c)
 
 		path := fmt.Sprintf("%s/%s/%s.java", config.JAVA_BASE_PATH, strings.Replace(c.Package, ".", "/", -1), c.Name)
-		err := ioutil.WriteFile(path, []byte(class), 0777)
+		err := ioutil.WriteFile(removeJavaPackagePathFromFilePath(path), []byte(class), 0777)
 		if err != nil {
 			fmt.Printf("Unable to write file: %s", err)
 		}
@@ -62,7 +62,7 @@ func generateJavaCode(tag string, force bool) {
 		fmt.Printf("  > Creating action: %s.java\n", action.Name)
 		actionEnum := GetJavaActionEnum(action)
 		path := fmt.Sprintf("%s/%s/%s.java", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1), action.Name)
-		err := ioutil.WriteFile(path, []byte(actionEnum), 0777)
+		err := ioutil.WriteFile(removeJavaPackagePathFromFilePath(path), []byte(actionEnum), 0777)
 		if err != nil {
 			fmt.Printf("Unable to write file: %s", err)
 		}
@@ -71,6 +71,11 @@ func generateJavaCode(tag string, force bool) {
 
 	fmt.Println("Finish generating Java code!")
 }
+
+func removeJavaPackagePathFromFilePath(path string) string {
+	return strings.Replace(path, "no/fint/model/", "", -1)
+}
+
 func getAction(p string, cl []types.Class) types.Action {
 	var action types.Action
 
@@ -158,13 +163,14 @@ func setupJavaDirStructure(tag string, force bool) {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
+
 	for _, pkg := range packages.DistinctPackageList(tag, force) {
 		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
-		err := os.MkdirAll(path, 0777)
+		err := os.MkdirAll(removeJavaPackagePathFromFilePath(path), 0777)
 		if err != nil {
 			fmt.Println("Unable to create packages structure")
 			fmt.Println(err)
 		}
-
 	}
+
 }

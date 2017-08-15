@@ -3,4 +3,4 @@
 
 rm -rf build
 
-gox -output="./build/{{.OS}}/{{.Dir}}" -rebuild -osarch="darwin/amd64 windows/amd64"
+gox -output="./build/{{.Dir}}-{{.OS}}" -rebuild -osarch="darwin/amd64 windows/amd64"
