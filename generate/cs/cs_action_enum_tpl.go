@@ -1,6 +1,6 @@
-package generate
+package cs
 
-const CS_ACTION_ENUM_TEMPLATE = `using System;
+const ACTION_ENUM_TEMPLATE = `using System;
 
 namespace {{ .Namespace }}
 {

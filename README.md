@@ -48,6 +48,17 @@ The downloaded XMI file is put in the `$HOME/.fint-model/.cache`. If you don't u
 
 Precompiled binaries can be downloaded [here](https://github.com/FINTprosjektet/fint-model/releases/latest)
 
+* Download for your os
+* Rename to fint-consumer
+* Copy to directory in your `PATH`
+
+*Example macOS*
+```shell
+$ mv fint-consumer-darwin fint-consumer
+$ chmod +x fint-consumer
+$ sudo mv fint-consumer /usr/local/bin
+```
+
 ### Go
 
 To install, use `go get`:

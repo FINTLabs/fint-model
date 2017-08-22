@@ -1,6 +1,6 @@
-package generate
+package cs
 
-const CS_CLASS_TEMPLATE = `using System;
+const CLASS_TEMPLATE = `using System;
 {{ if .Using }}
 {{ range $u := .Using }}
 using {{ $u }};

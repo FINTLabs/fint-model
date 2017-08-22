@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"github.com/FINTprosjektet/fint-model/common/types"
 	"text/template"
+	"github.com/FINTprosjektet/fint-model/generate/java"
+	"github.com/FINTprosjektet/fint-model/generate/cs"
 )
 
 var funcMap = template.FuncMap{
@@ -14,19 +16,19 @@ var funcMap = template.FuncMap{
 }
 
 func GetJavaClass(c types.Class) string {
-	return getClass(c, JAVA_CLASS_TEMPLATE)
+	return getClass(c, java.CLASS_TEMPLATE)
 }
 
 func GetJavaActionEnum(a types.Action) string  {
-	return getActionEnum(a, JAVA_ACTION_ENUM_TEMPLATE)
+	return getActionEnum(a, java.ACTION_ENUM_TEMPLATE)
 }
 
 func GetCSActionEnum(a types.Action) string  {
-	return getActionEnum(a, CS_ACTION_ENUM_TEMPLATE)
+	return getActionEnum(a, cs.ACTION_ENUM_TEMPLATE)
 }
 
 func GetCSClass(c types.Class) string {
-	return getClass(c, CS_CLASS_TEMPLATE)
+	return getClass(c, cs.CLASS_TEMPLATE)
 }
 
 func getClass(c types.Class, t string) string {
