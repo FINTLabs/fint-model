@@ -1,8 +1,8 @@
 *.test
 .idea
 .DS_Store
-java
-net
+/java/
+/net/
 *.xml
 fint-model
 build
