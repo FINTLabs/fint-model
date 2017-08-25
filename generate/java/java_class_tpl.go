@@ -1,6 +1,8 @@
 package java
 
-const CLASS_TEMPLATE = `package {{ .Package }};
+const CLASS_TEMPLATE = `// Built from tag {{ .GitTag }}
+
+package {{ .Package }};
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

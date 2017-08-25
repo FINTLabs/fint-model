@@ -34,6 +34,7 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import,
 		class.Package = getPackagePath(c, doc)
 		class.Namespace = getNamespacePath(c, doc)
 		class.Identifiable = identifiable(class.Attributes)
+		class.GitTag = tag
 
 		imp := types.Import{
 			Java:   fmt.Sprintf("%s.%s", class.Package, class.Name),

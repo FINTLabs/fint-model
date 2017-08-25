@@ -1,6 +1,8 @@
 package cs
 
-const CLASS_TEMPLATE = `using System;
+const CLASS_TEMPLATE = `// Built from tag {{ .GitTag }}
+
+using System;
 {{ if .Using }}
 {{ range $u := .Using }}
 using {{ $u }};

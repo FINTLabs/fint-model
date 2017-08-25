@@ -58,7 +58,7 @@ func generateJavaCode(tag string, force bool) {
 	}
 
 	for p, cl := range packageClassMap {
-		action := getAction(p, cl)
+		action := getAction(p, cl, tag)
 		fmt.Printf("  > Creating action: %s.java\n", action.Name)
 		actionEnum := GetJavaActionEnum(action)
 		path := fmt.Sprintf("%s/%s/%s.java", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1), action.Name)
@@ -76,7 +76,7 @@ func removeJavaPackagePathFromFilePath(path string) string {
 	return strings.Replace(path, "no/fint/model/", "", -1)
 }
 
-func getAction(p string, cl []types.Class) types.Action {
+func getAction(p string, cl []types.Class, tag string) types.Action {
 	var action types.Action
 
 	packageList := strings.Split(p, ".")
@@ -85,6 +85,7 @@ func getAction(p string, cl []types.Class) types.Action {
 
 	action.Package = p
 	action.Namespace = p
+	action.GitTag = tag
 
 	for _, c := range cl {
 		if c.Identifiable && !c.Abstract {
@@ -114,7 +115,7 @@ func generateCSCode(tag string, force bool) {
 	}
 
 	for p, cl := range packageClassMap {
-		action := getAction(p, cl)
+		action := getAction(p, cl, tag)
 		fmt.Printf("  > Creating action: %s.cs\n", action.Name)
 		actionEnum := GetCSActionEnum(action)
 		path := fmt.Sprintf("%s/%s.cs", getCSPath(p), action.Name)
