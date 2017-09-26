@@ -6,6 +6,7 @@ import (
 	"text/template"
 	"github.com/FINTprosjektet/fint-model/generate/java"
 	"github.com/FINTprosjektet/fint-model/generate/cs"
+	"strings"
 )
 
 var funcMap = template.FuncMap{
@@ -13,6 +14,7 @@ var funcMap = template.FuncMap{
 	"sub":      func(i int, ii int) int { return i - ii },
 	"javaType": types.GetJavaType,
 	"csType":   types.GetCSType,
+	"upperCaseFirst": func(s string) string { return strings.Title(s) },
 }
 
 func GetJavaClass(c types.Class) string {
