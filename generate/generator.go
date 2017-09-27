@@ -7,11 +7,13 @@ import (
 	"github.com/FINTprosjektet/fint-model/generate/java"
 	"github.com/FINTprosjektet/fint-model/generate/cs"
 	"strings"
+	"fmt"
 )
 
 var funcMap = template.FuncMap{
 	//"add": func(i int, ii int) int { return i + ii },
 	"sub":      func(i int, ii int) int { return i - ii },
+	"listFilt": func(list bool, s string) string { if (list) { return fmt.Sprintf("List<%s>", s); } else { return s; } },
 	"javaType": types.GetJavaType,
 	"csType":   types.GetCSType,
 	"upperCaseFirst": func(s string) string { return strings.Title(s) },

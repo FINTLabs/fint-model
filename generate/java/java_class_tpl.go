@@ -36,7 +36,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 {{ end -}}
 {{ if .Attributes }}
 	{{ range $att := .Attributes -}}
-		private {{ javaType $att.Type $att.List}} {{ $att.Name }};
+		private {{ javaType $att.Type | listFilt $att.List }} {{ $att.Name }};
 	{{ end -}}
 {{ end -}}
 }

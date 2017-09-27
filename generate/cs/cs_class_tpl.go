@@ -26,7 +26,7 @@ namespace {{ .Namespace }}
         {{ end }}
 	{{ if .Attributes }}
 		{{ range $att := .Attributes -}}
-			public {{ csType $att.Type $att.List}} {{ upperCaseFirst $att.Name }} { get; set; }
+			public {{ csType $att.Type | listFilt $att.List }} {{ upperCaseFirst $att.Name }} { get; set; }
 		{{ end -}}
 	{{ end }}
 	}

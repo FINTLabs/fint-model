@@ -9,11 +9,11 @@ var JAVA_TYPE_MAP = map[string]string{
 }
 
 
-func GetJavaType(t string, list bool) string {
+func GetJavaType(t string) string {
 
 	value, ok := JAVA_TYPE_MAP[t]
 	if ok {
-		return getType(list, value)
+		return value
 	} else {
 		return t
 	}

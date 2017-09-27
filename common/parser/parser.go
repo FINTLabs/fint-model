@@ -90,7 +90,7 @@ func getImports(c types.Class, imports map[string]types.Import) []string {
 	attribs := c.Attributes
 	var imps []string
 	for _, att := range attribs {
-		javaType := types.GetJavaType(att.Type, att.List)
+		javaType := types.GetJavaType(att.Type)
 		if imports[javaType].Java != c.Package && len(javaType) > 0 {
 			imps = append(imps, imports[javaType].Java)
 		}
@@ -108,7 +108,7 @@ func getUsing(c types.Class, imports map[string]types.Import) []string {
 	attribs := c.Attributes
 	var imps []string
 	for _, att := range attribs {
-		csType := types.GetCSType(att.Type, att.List)
+		csType := types.GetCSType(att.Type)
 		if imports[csType].CSharp != c.Package && len(imports[csType].CSharp) > 0 {
 			imps = append(imps, imports[csType].CSharp)
 		}
