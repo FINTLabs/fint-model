@@ -89,8 +89,8 @@ func getImports(c types.Class, imports map[string]types.Import) []string {
 
 	attribs := c.Attributes
 	var imps []string
-	for _, value := range attribs {
-		javaType := types.GetJavaType(value.Type)
+	for _, att := range attribs {
+		javaType := types.GetJavaType(att.Type, att.List)
 		if imports[javaType].Java != c.Package && len(javaType) > 0 {
 			imps = append(imps, imports[javaType].Java)
 		}
@@ -107,8 +107,8 @@ func getUsing(c types.Class, imports map[string]types.Import) []string {
 
 	attribs := c.Attributes
 	var imps []string
-	for _, value := range attribs {
-		csType := types.GetCSType(value.Type)
+	for _, att := range attribs {
+		csType := types.GetCSType(att.Type, att.List)
 		if imports[csType].CSharp != c.Package && len(imports[csType].CSharp) > 0 {
 			imps = append(imps, imports[csType].CSharp)
 		}
@@ -223,6 +223,7 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 
 		attrib := types.Attribute{}
 		attrib.Name = replaceNO(a.SelectAttr("name"))
+		attrib.List = strings.Compare(a.SelectElement("bounds").SelectAttr("upper"), "*") == 0
 		attrib.Type = replaceNO(a.SelectElement("properties").SelectAttr("type"))
 
 		attributes = append(attributes, attrib)

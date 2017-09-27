@@ -8,11 +8,11 @@ var CS_TYPE_MAP = map[string]string{
 	"double":   "double",
 }
 
-func GetCSType(t string) string {
+func GetCSType(t string, list bool) string {
 
 	value, ok := CS_TYPE_MAP[t]
 	if ok {
-		return value
+		return getType(list, value)
 	} else {
 		return t
 	}

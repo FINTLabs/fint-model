@@ -8,12 +8,14 @@ var JAVA_TYPE_MAP = map[string]string{
 	"double":   "double",
 }
 
-func GetJavaType(t string) string {
+
+func GetJavaType(t string, list bool) string {
 
 	value, ok := JAVA_TYPE_MAP[t]
 	if ok {
-		return value
+		return getType(list, value)
 	} else {
 		return t
 	}
 }
+

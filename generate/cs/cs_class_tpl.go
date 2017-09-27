@@ -3,6 +3,8 @@ package cs
 const CLASS_TEMPLATE = `// Built from tag {{ .GitTag }}
 
 using System;
+using System.Collections.Generic;
+
 {{ if .Using }}
 {{ range $u := .Using }}
 using {{ $u }};
@@ -24,7 +26,7 @@ namespace {{ .Namespace }}
         {{ end }}
 	{{ if .Attributes }}
 		{{ range $att := .Attributes -}}
-			public {{ csType $att.Type}} {{ upperCaseFirst $att.Name }} { get; set; }
+			public {{ csType $att.Type $att.List}} {{ upperCaseFirst $att.Name }} { get; set; }
 		{{ end -}}
 	{{ end }}
 	}

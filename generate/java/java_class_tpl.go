@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 {{- if .Imports }}
 {{ range $i := .Imports }}
@@ -35,7 +36,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 {{ end -}}
 {{ if .Attributes }}
 	{{ range $att := .Attributes -}}
-		private {{ javaType $att.Type}} {{ $att.Name }};
+		private {{ javaType $att.Type $att.List}} {{ $att.Name }};
 	{{ end -}}
 {{ end -}}
 }
