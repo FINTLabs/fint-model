@@ -45,6 +45,7 @@ func dumpClass(c types.Class) {
 	for _, a := range c.Attributes {
 		fmt.Printf("  Attribute: %s\n", a.Name)
 		fmt.Printf("    Type: %s\n", a.Type)
+		fmt.Printf("    isList: %s\n", a.List)
 	}
 	fmt.Println("  Relations:")
 	for _, r := range c.Relations {
