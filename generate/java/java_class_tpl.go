@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import java.util.List;
 
 {{- if .Imports }}
@@ -18,11 +19,13 @@ import {{ $i }};
 
 @Data
 {{ if .Extends -}}
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper=true)
+@ToString(callSuper=true)
 {{ else -}}
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@ToString
 {{ end -}}
 public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extends {{ .Extends }} {{ end -}} {
 
