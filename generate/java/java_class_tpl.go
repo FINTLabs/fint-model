@@ -23,7 +23,9 @@ import {{ $i }};
 @ToString(callSuper=true)
 {{ else -}}
 @AllArgsConstructor
+{{ if .Attributes }}
 @NoArgsConstructor
+{{ end -}}
 @EqualsAndHashCode
 @ToString
 {{ end -}}
