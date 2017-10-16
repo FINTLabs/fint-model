@@ -16,6 +16,7 @@ pipeline {
                     VERSION=readFile('version.txt').trim()
                 }
                 sh "docker build --build-arg VERSION=${VERSION} ."
+                sh "find ."
                 archiveArtifacts 'build/**'
             }
         }
