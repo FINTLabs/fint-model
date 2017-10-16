@@ -15,7 +15,7 @@ pipeline {
                 script {
                     VERSION=readFile('version.txt').trim()
                     docker.build("fint-model:${env.BUILD_ID}", "--build-arg VERSION=${VERSION} .").inside {
-                        stash includes: '/go/src/app/vendor/github.com/FINTprosjektet/fint-model/build/**', name: 'artifacts'
+                        stash includes: '/go/src/app/vendor/github.com/FINTprosjektet/fint-model/build/*', name: 'artifacts'
                     }
                 }
             }
@@ -31,7 +31,7 @@ pipeline {
                 script {
                     VERSION=readFile('version.txt').trim()
                 }
-                archiveArtifacts '/go/src/app/vendor/github.com/FINTprosjektet/fint-model/build/**'
+                archiveArtifacts '/go/src/app/vendor/github.com/FINTprosjektet/fint-model/build/*'
             }
         }
     }
