@@ -14,7 +14,7 @@ pipeline {
                 unstash 'version'
                 script {
                     VERSION=readFile('version.txt').trim()
-                    docker.build("fint-model:${env.BUILD_ID}", "--build-arg VERSION=${VERSION}").inside {
+                    docker.build("fint-model:${env.BUILD_ID}", "--build-arg VERSION=${VERSION} .").inside {
                         archiveArtifacts 'build/**'
                     }
                 }
