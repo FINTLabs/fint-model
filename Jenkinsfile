@@ -15,6 +15,7 @@ pipeline {
                 script {
                     VERSION=readFile('version.txt').trim()
                     docker.build("fint-model:${env.BUILD_ID}", "--build-arg VERSION=${VERSION} .").inside {
+                        sh "find ."
                         archiveArtifacts 'build/**'
                     }
                 }
