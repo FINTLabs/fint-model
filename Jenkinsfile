@@ -13,14 +13,14 @@ pipeline {
                 docker {
                     label 'docker'
                     image 'golang'
-                    args "-v /tmp:/tmp"
+                    args "-v /tmp:/tmp -v .:/go/src/app/vendor/github.com/FINTprosjektet/fint-model"
                 }
             }
             steps {
                 unstash 'version'
                 script {
                     VERSION=readFile('version.txt').trim()
-                    sh "GOARCH=amd64; for GOOS in darwin windows; do go build -v -ldflags='-X main.Version=${VERSION}' -o fint-model-\$GOOS; done"
+                    sh "cd /go/src/app/vendor/github.com/FINTprosjektet/fint-model; GOARCH=amd64; for GOOS in darwin windows; do go build -v -ldflags='-X main.Version=${VERSION}' -o fint-model-\$GOOS; done"
                     stash name: 'artifacts', includes: 'fint-model-*'
                 }
             }
