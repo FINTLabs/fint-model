@@ -20,10 +20,7 @@ pipeline {
                 unstash 'version'
                 script {
                     VERSION=readFile('version.txt').trim()
-                    sh "GOARCH=amd64
-                        for GOOS in darwin windows; do
-                        go build -v -ldflags='-X main.Version=${VERSION}' -o fint-model-\$GOOS
-                        done"
+                    sh "GOARCH=amd64; for GOOS in darwin windows; do go build -v -ldflags='-X main.Version=${VERSION}' -o fint-model-\$GOOS; done"
                     stash name: 'artifacts', includes: 'fint-model-*'
                 }
             }
