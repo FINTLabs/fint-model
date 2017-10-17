@@ -17,6 +17,6 @@ node('docker') {
         unstash 'version'
         unstash 'artifacts'
         VERSION=readFile('version.txt').trim()
-        archiveArtifacts 'build/**'
+        archiveArtifacts 'fint-model-*'
     }
 }
