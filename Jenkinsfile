@@ -1,43 +1,22 @@
-pipeline {
-    agent none
-    stages {
-        stage('Prepare') {
-            agent { label 'master' }
-            steps {
-                sh 'git log --oneline | nl -nln | perl -lne \'if (/^(\\d+).*Version (\\d+\\.\\d+\\.\\d+)/) { print "$2-$1"; exit; }\' > version.txt'
-                stash includes: 'version.txt', name: 'version'
-            }
+node('master') {
+    stage('Prepare') {
+        sh 'git log --oneline | nl -nln | perl -lne \'if (/^(\\d+).*Version (\\d+\\.\\d+\\.\\d+)/) { print "$2-$1"; exit; }\' > version.txt'
+        stash includes: 'version.txt', name: 'version'
+    }
+}
+node('docker') {
+    stage('Build') {
+        docker.image('golang').inside("-v /tmp:/tmp -v ${pwd()}:/go/src/app/vendor/github.com/FINTprosjektet/fint-model") {
+            unstash 'version'
+            VERSION=readFile('version.txt').trim()
+            sh "cd /go/src/app/vendor/github.com/FINTprosjektet/fint-model; GOARCH=amd64; for GOOS in darwin windows; do go build -v -ldflags='-X main.Version=${VERSION}' -o fint-model-\$GOOS; done"
+            stash name: 'artifacts', includes: 'fint-model-*'
         }
-        stage('Build') {
-            agent { 
-                docker {
-                    label 'docker'
-                    image 'golang'
-                    args "-v /tmp:/tmp -v .:/go/src/app/vendor/github.com/FINTprosjektet/fint-model"
-                }
-            }
-            steps {
-                unstash 'version'
-                script {
-                    VERSION=readFile('version.txt').trim()
-                    sh "cd /go/src/app/vendor/github.com/FINTprosjektet/fint-model; GOARCH=amd64; for GOOS in darwin windows; do go build -v -ldflags='-X main.Version=${VERSION}' -o fint-model-\$GOOS; done"
-                    stash name: 'artifacts', includes: 'fint-model-*'
-                }
-            }
-        }
-        stage('Publish') {
-            agent { label 'docker' }
-            when {
-                branch 'master'
-            }
-            steps {
-                unstash 'version'
-                unstash 'artifacts'
-                script {
-                    VERSION=readFile('version.txt').trim()
-                }
-                archiveArtifacts 'build/**'
-            }
-        }
+    }
+    stage('Publish') {
+        unstash 'version'
+        unstash 'artifacts'
+        VERSION=readFile('version.txt').trim()
+        archiveArtifacts 'build/**'
     }
 }
