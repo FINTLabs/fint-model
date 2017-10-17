@@ -15,7 +15,7 @@ pipeline {
                 script {
                     VERSION=readFile('version.txt').trim()
                     docker.build("fint-model:${env.BUILD_ID}", ".").inside {
-                        dir '/go/src/app/vendor/github.com/FINTprosjektet/fint-model' {
+                        dir('/go/src/app/vendor/github.com/FINTprosjektet/fint-model') {
                             sh "gox -output='./build/{{.Dir}}-{{.OS}}' -verbose -rebuild -osarch='darwin/amd64 windows/amd64' -ldflags='-X main.Version=${VERSION}'"
                             stash name: 'artifacts', includes: 'build/**'
                         }
