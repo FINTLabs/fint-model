@@ -13,7 +13,7 @@ pipeline {
                 docker {
                     label 'docker'
                     image 'golang'
-                    args "-v /tmp:/tmp -v .:/go/src/app/vendor/github.com/FINTprosjektet/fint-model -w /go/src/app/vendor/github.com/FINTprosjektet/fint-model bash"
+                    args "-v /tmp:/tmp"
                 }
             }
             steps {
