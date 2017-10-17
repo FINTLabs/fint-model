@@ -9,17 +9,22 @@ pipeline {
             }
         }
         stage('Build') {
-            agent { label 'docker' }
+            agent { 
+                docker {
+                    label 'docker'
+                    image 'golang'
+                    args "-v /tmp:/tmp -v ${env.WORKSPACE}:/go/src/app/vendor/github.com/FINTprosjektet/fint-model -w /go/src/app/vendor/github.com/FINTprosjektet/fint-model bash"
+                }
+            }
             steps {
                 unstash 'version'
                 script {
                     VERSION=readFile('version.txt').trim()
-                    docker.build("fint-model:${env.BUILD_ID}", ".").inside {
-                        dir('/go/src/app/vendor/github.com/FINTprosjektet/fint-model') {
-                            sh "gox -output='./build/{{.Dir}}-{{.OS}}' -verbose -rebuild -osarch='darwin/amd64 windows/amd64' -ldflags='-X main.Version=${VERSION}'"
-                            stash name: 'artifacts', includes: 'build/**'
-                        }
-                    }
+                    sh "GOARCH=amd64
+                        for GOOS in darwin windows; do
+                        go build -v -ldflags='-X main.Version=${VERSION}' -o fint-model-\$GOOS
+                        done"
+                    stash name: 'artifacts', includes: 'fint-model-*'
                 }
             }
         }
