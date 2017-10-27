@@ -3,7 +3,6 @@ def isRelease = false
 String commitVersion = "0.0.0"
 node('master') {
     stage('Prepare') {
-        checkout scm
         sh "pwd; ls -l"
         sh 'git log --oneline | nl -nln | perl -lne \'if (/^(\\d+).*Version (\\d+\\.\\d+\\.\\d+)/) { print "$2-$1"; exit; }\' > version.txt'
         stash includes: 'version.txt', name: 'version'
@@ -18,7 +17,7 @@ node('master') {
 node('docker') {
     stage('Build') {
         String goPath = "/go/src/app/vendor/github.com/FINTprosjektet/fint-model"
-        docker.image('golang').inside("-v /tmp:/tmp -v ${pwd()}:${goPath}") {
+        docker.image('golang').inside("-v /tmp:/tmp -v ${pwd()}:${goPath}") {            
             sh "pwd; ls -l"
             sh "go-wrapper download github.com/mitchellh/gox && go-wrapper install github.com/mitchellh/gox"
             unstash 'version'
