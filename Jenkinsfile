@@ -3,6 +3,7 @@ def isRelease = false
 String commitVersion = "0.0.0"
 node('master') {
     stage('Prepare') {
+        checkout scm
         sh "pwd; ls -l"
         sh 'git log --oneline | nl -nln | perl -lne \'if (/^(\\d+).*Version (\\d+\\.\\d+\\.\\d+)/) { print "$2-$1"; exit; }\' > version.txt'
         stash includes: 'version.txt', name: 'version'
