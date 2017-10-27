@@ -44,7 +44,7 @@ node('docker') {
                 echo "This is the version: <<${commitVersion}>>"
                 withCredentials([string(credentialsId: 'github_fint_jenkins', variable: 'GITHUB_TOKEN')]) {
                     sh "gothub release --user FINTprosjektet --repo fint-model --tag v${commitVersion} --name v${commitVersion} --description '${commitMessage}'"
-                    sh "for f in fint-model-*; do gothub upload --user FINTprosjektet --repo fint-model --tag v${commitVersion} -fint-model-* \$f --file \$f; done"
+                    sh "for f in fint-model-*; do gothub upload --user FINTprosjektet --repo fint-model --tag v${commitVersion} --name \$f --file \$f; done"
                 }
             }
         }        
