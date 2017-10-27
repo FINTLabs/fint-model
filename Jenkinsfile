@@ -7,9 +7,11 @@ node('master') {
         sh 'git log --oneline | nl -nln | perl -lne \'if (/^(\\d+).*Version (\\d+\\.\\d+\\.\\d+)/) { print "$2-$1"; exit; }\' > version.txt'
         stash includes: 'version.txt', name: 'version'
         commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+        echo "This is the commit message: <<${commitMessage}>>"
         def m = commitMessage =~ /Version (\d+\.\d+\.\d+)/
         if (m) {
             commitVersion = m.group(1)
+            echo "Release version: <<${commitVersion}>>"
             isRelease = true
         }
     }
