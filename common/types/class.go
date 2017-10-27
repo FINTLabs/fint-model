@@ -8,9 +8,10 @@ type Class struct {
 	Imports          []string
 	Namespace        string
 	Using            []string
-	DocumentationUrl string
+	Documentation    string
 	Attributes       []Attribute
 	Relations        []string
 	Identifiable     bool
 	GitTag           string
+	Stereotype       string
 }

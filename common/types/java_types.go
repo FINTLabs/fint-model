@@ -1,11 +1,15 @@
 package types
 
 var JAVA_TYPE_MAP = map[string]string{
-	"string":   "String",
-	"boolean":  "boolean",
-	"date":     "Date",
-	"dateTime": "Date",
-	"double":   "double",
+	"string":      "String",
+	"boolean":     "boolean",
+	"date":        "Date",
+	"dateTime":    "Date",
+	"double":      "double",
+	"hovedklasse": "FintMainObject",
+	"referanse":   "FintReference",
+	"abstrakt":    "FintAbstractObject",
+	"datatype":    "FintComplexDatatypeObject",
 }
 
 

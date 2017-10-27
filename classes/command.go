@@ -30,7 +30,7 @@ func dumpClass(c types.Class) {
 	fmt.Printf("  Identifiable: %t\n", c.Identifiable)
 	fmt.Printf("  Package: %s\n", c.Package)
 	fmt.Printf("  Namespace: %s\n", c.Namespace)
-	fmt.Printf("  DocumentationUrl: %s\n", c.DocumentationUrl)
+	//fmt.Printf("  DocumentationUrl: %s\n", c.DocumentationUrl)
 	if len(c.Extends) > 0 {
 		fmt.Printf("  Extends: %s\n", c.Extends)
 	}

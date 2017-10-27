@@ -4,12 +4,11 @@ const CLASS_TEMPLATE = `// Built from tag {{ .GitTag }}
 
 package {{ .Package }};
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import java.util.List;
+import no.fint.model.*;
 
 {{- if .Imports }}
 {{ range $i := .Imports }}
@@ -22,14 +21,10 @@ import {{ $i }};
 @EqualsAndHashCode(callSuper=true)
 @ToString(callSuper=true)
 {{ else -}}
-@AllArgsConstructor
-{{ if .Attributes }}
-@NoArgsConstructor
-{{ end -}}
 @EqualsAndHashCode
 @ToString
 {{ end -}}
-public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extends {{ .Extends }} {{ end -}} {
+public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extends {{ .Extends }} {{ end -}} implements {{ javaType .Stereotype }} {
 
 {{- if .Relations }}
 	{{ $c := sub (len .Relations) 1 -}}
@@ -45,5 +40,4 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 	{{ end -}}
 {{ end -}}
 }
-
 `

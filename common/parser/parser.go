@@ -24,17 +24,28 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import,
 	classElements := xmlquery.Find(doc, "//element[@type='Class']")
 	for _, c := range classElements {
 
+		properties := c.SelectElement("properties")
 		var class types.Class
 
 		class.Name = replaceNO(c.SelectAttr("name"))
-		class.Abstract = toBool(c.SelectElement("properties").SelectAttr("isAbstract"))
+		class.Abstract = toBool(properties.SelectAttr("isAbstract"))
 		class.Extends = getExtends(doc, c)
 		class.Attributes = getAttributes(c)
 		class.Relations = getRelations(doc, c)
 		class.Package = getPackagePath(c, doc)
 		class.Namespace = getNamespacePath(c, doc)
 		class.Identifiable = identifiable(class.Attributes)
+		class.Stereotype = properties.SelectAttr("stereotype")
+		class.Documentation = properties.SelectAttr("documentation")
 		class.GitTag = tag
+
+		if len(class.Stereotype) == 0 {
+			if (class.Abstract) {
+				class.Stereotype = "abstrakt"
+			} else {
+				class.Stereotype = "datatype"
+			}
+		}
 
 		imp := types.Import{
 			Java:   fmt.Sprintf("%s.%s", class.Package, class.Name),
