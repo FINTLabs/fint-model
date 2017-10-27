@@ -16,6 +16,7 @@ node('master') {
 }
 node('docker') {
     stage('Build') {
+        checkout scm
         sh "pwd; ls -l"
         String goPath = "/go/src/app/vendor/github.com/FINTprosjektet/fint-model"
         docker.image('golang').inside("-v /tmp:/tmp -v ${pwd()}:${goPath}") {            
