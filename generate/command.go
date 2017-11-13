@@ -25,6 +25,10 @@ func CmdGenerate(c *cli.Context) {
 	}
 	force := c.GlobalBool("force")
 
+	if c.String("lang") == "SCALA" {
+		generateScalaCode(tag, force)
+	}
+	
 	if c.String("lang") == "JAVA" {
 		generateJavaCode(tag, force)
 	}
@@ -36,14 +40,48 @@ func CmdGenerate(c *cli.Context) {
 	if c.String("lang") == "ALL" {
 		generateCSCode(tag, force)
 		generateJavaCode(tag, force)
+		generateScalaCode(tag, force)
 	}
+}
+
+func generateScalaCode(tag string, force bool) {
+
+	document.Get(tag, force)
+	fmt.Println("Generating Scala code:")
+	setupJavaDirStructure(tag, force, config.SCALA_BASE_PATH)
+	classes, _, packageClassMap, _ := parser.GetClasses(tag, force)
+	for _, c := range classes {
+		fmt.Printf("  > Creating class: %s.scala\n", c.Name)
+		class := GetScalaClass(c)
+
+		path := fmt.Sprintf("%s/%s/%s.scala", config.SCALA_BASE_PATH, strings.Replace(c.Package, ".", "/", -1), c.Name)
+		err := ioutil.WriteFile(removeJavaPackagePathFromFilePath(path), []byte(class), 0777)
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
+		}
+
+	}
+
+	for p, cl := range packageClassMap {
+		action := getAction(p, cl, tag)
+		fmt.Printf("  > Creating action: %s.scala\n", action.Name)
+		actionEnum := GetScalaActionEnum(action)
+		path := fmt.Sprintf("%s/%s/%s.scala", config.SCALA_BASE_PATH, strings.Replace(p, ".", "/", -1), action.Name)
+		err := ioutil.WriteFile(removeJavaPackagePathFromFilePath(path), []byte(actionEnum), 0777)
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
+		}
+
+	}
+
+	fmt.Println("Finished generating Scala code!")
 }
 
 func generateJavaCode(tag string, force bool) {
 
 	document.Get(tag, force)
 	fmt.Println("Generating Java code:")
-	setupJavaDirStructure(tag, force)
+	setupJavaDirStructure(tag, force, config.JAVA_BASE_PATH)
 	classes, _, packageClassMap, _ := parser.GetClasses(tag, force)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
@@ -69,8 +107,9 @@ func generateJavaCode(tag string, force bool) {
 
 	}
 
-	fmt.Println("Finish generating Java code!")
+	fmt.Println("Finished generating Java code!")
 }
+
 
 func removeJavaPackagePathFromFilePath(path string) string {
 	return strings.Replace(path, "no/fint/model/", "", -1)
@@ -156,17 +195,17 @@ func getCSPath(ns string) string {
 	return path
 }
 
-func setupJavaDirStructure(tag string, force bool) {
+func setupJavaDirStructure(tag string, force bool, base_path string) {
 	fmt.Println("  > Setup directory structure.")
 	os.RemoveAll("java")
-	err := os.MkdirAll(config.JAVA_BASE_PATH, 0777)
+	err := os.MkdirAll(base_path, 0777)
 	if err != nil {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
 
 	for _, pkg := range packages.DistinctPackageList(tag, force) {
-		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
+		path := fmt.Sprintf("%s/%s", base_path, strings.Replace(pkg, ".", "/", -1))
 		err := os.MkdirAll(removeJavaPackagePathFromFilePath(path), 0777)
 		if err != nil {
 			fmt.Println("Unable to create packages structure")

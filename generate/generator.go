@@ -5,6 +5,7 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/types"
 	"text/template"
 	"github.com/FINTprosjektet/fint-model/generate/java"
+	"github.com/FINTprosjektet/fint-model/generate/scala"
 	"github.com/FINTprosjektet/fint-model/generate/cs"
 	"strings"
 	"fmt"
@@ -17,6 +18,14 @@ var funcMap = template.FuncMap{
 	"javaType": types.GetJavaType,
 	"csType":   types.GetCSType,
 	"upperCaseFirst": func(s string) string { return strings.Title(s) },
+}
+
+func GetScalaClass(c types.Class) string {
+	return getClass(c, scala.CLASS_TEMPLATE)
+}
+
+func GetScalaActionEnum(a types.Action) string  {
+	return getActionEnum(a, scala.ACTION_ENUM_TEMPLATE)
 }
 
 func GetJavaClass(c types.Class) string {
