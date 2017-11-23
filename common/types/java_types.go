@@ -2,10 +2,10 @@ package types
 
 var JAVA_TYPE_MAP = map[string]string{
 	"string":      "String",
-	"boolean":     "boolean",
+	"boolean":     "Boolean",
 	"date":        "Date",
 	"dateTime":    "Date",
-	"double":      "double",
+	"double":      "Double",
 	"hovedklasse": "FintMainObject",
 	"referanse":   "FintReference",
 	"abstrakt":    "FintAbstractObject",
