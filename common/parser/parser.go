@@ -77,9 +77,7 @@ func identifiableFromExtends(class types.Class, classMap map[string]types.Class)
 		return true
 	}
 	if len(class.Extends) > 0 {
-		if classMap[class.Extends].Identifiable {
-			return true
-		}
+		return identifiableFromExtends(classMap[class.Extends], classMap)
 	}
 	return false
 }
