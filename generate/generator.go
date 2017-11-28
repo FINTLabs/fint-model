@@ -15,7 +15,7 @@ var funcMap = template.FuncMap{
 	"sub":      func(i int, ii int) int { return i - ii },
 	"listFilt": func(list bool, s string) string { if (list) { return fmt.Sprintf("List<%s>", s); } else { return s; } },
 	"javaType": types.GetJavaType,
-	"csType":   func(s string, opt bool) string { typ := types.GetCSType(s); if (opt && typ != "string") { return typ + "?"; } else { return typ; } },
+	"csType":   func(s string, opt bool) string { typ := types.GetCSType(s); if (opt && types.IsValueType(typ)) { return typ + "?"; } else { return typ; } },
 	"upperCaseFirst": func(s string) string { return strings.Title(s) },
 }
 
