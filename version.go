@@ -1,4 +1,4 @@
 package main
 
 const Name string = "fint-model"
-var Version string
+const Version string = "1.6.1"
