@@ -2,8 +2,9 @@
 .idea
 .DS_Store
 /java/
-/net/
+/cs/
 *.xml
 fint-model
 build
 fint-model.exe
+*.orig

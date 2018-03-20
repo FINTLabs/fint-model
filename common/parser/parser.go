@@ -16,6 +16,7 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import,
 	doc := document.Get(tag, force)
 
 	var classes []types.Class
+	// TODO BUG: packageMap and classMap fail for classes with the same name!
 	packageMap := make(map[string]types.Import)
 	classMap := make(map[string]types.Class)
 	javaPackageClassMap := make(map[string][]types.Class)
@@ -40,7 +41,7 @@ func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import,
 		class.GitTag = tag
 
 		if len(class.Stereotype) == 0 {
-			if (class.Abstract) {
+			if class.Abstract {
 				class.Stereotype = "abstrakt"
 			} else {
 				class.Stereotype = "datatype"
@@ -262,7 +263,8 @@ func getRelations(doc *xmlquery.Node, c *xmlquery.Node) []string {
 	return assocs
 }
 
-// TODO: This is actualy iterativ and not recursive. This should probably be fixed in the future.
+// TODO: This is actually iterative and not recursive, and works only for linear inheritance.
+// TODO: Possible to combine with getAssociationsFromExtends?
 func getRecursivelyAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) []string {
 	var assocs []string
 	extAssocs, extends := getAssociationsFromExtends(doc, c)
