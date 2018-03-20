@@ -139,13 +139,11 @@ func getPackagePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 	classPkg := getPackage(c)
 	pkgs = append(pkgs, getNameLower(classPkg, doc))
 
-	// TODO: This needs to be done much better
 	parentPkg = getParentPackage(classPkg, doc)
-	parentPkg2 := getParentPackage(parentPkg, doc)
-	parentPkg3 := getParentPackage(parentPkg2, doc)
-
-	pkgs = append(pkgs, getNameLower(parentPkg, doc), getNameLower(parentPkg2, doc), getNameLower(parentPkg3, doc))
-
+	for parentPkg != "" {
+		pkgs = append(pkgs, getNameLower(parentPkg, doc))
+		parentPkg = getParentPackage(parentPkg, doc)
+	}
 	pkgs = utils.TrimArray(pkgs)
 	pkgs = utils.Reverse(pkgs)
 	return replaceNO(fmt.Sprintf("%s.%s", config.JAVA_PACKAGE_BASE, strings.Join(pkgs, ".")))
@@ -159,13 +157,11 @@ func getNamespacePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 	classPkg := getPackage(c)
 	pkgs = append(pkgs, getName(classPkg, doc))
 
-	// TODO: This needs to be done much better
 	parentPkg = getParentPackage(classPkg, doc)
-	parentPkg2 := getParentPackage(parentPkg, doc)
-	parentPkg3 := getParentPackage(parentPkg2, doc)
-
-	pkgs = append(pkgs, getName(parentPkg, doc), getName(parentPkg2, doc), getName(parentPkg3, doc))
-
+	for parentPkg != "" {
+		pkgs = append(pkgs, getNameLower(parentPkg, doc))
+		parentPkg = getParentPackage(parentPkg, doc)
+	}
 	pkgs = utils.TrimArray(pkgs)
 	pkgs = utils.Reverse(pkgs)
 	return replaceNO(fmt.Sprintf("%s.%s", config.NET_NAMESPACE_BASE, strings.Join(pkgs, ".")))
@@ -209,11 +205,15 @@ func getParentPackage(idref string, doc *xmlquery.Node) string {
 		return ""
 	}
 	if len(parent) < 1 {
-		fmt.Printf("Could not find any elements with idref %s\n", idref)
 		return ""
 	}
 
-	return parent[0].SelectElement("model").SelectAttr("package")
+	model := parent[0].SelectElement("model")
+	if model == nil {
+		return ""
+	}
+
+	return model.SelectAttr("package")
 }
 
 func getPackage(c *xmlquery.Node) string {
