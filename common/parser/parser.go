@@ -159,7 +159,7 @@ func getNamespacePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 
 	parentPkg = getParentPackage(classPkg, doc)
 	for parentPkg != "" {
-		pkgs = append(pkgs, getNameLower(parentPkg, doc))
+		pkgs = append(pkgs, getName(parentPkg, doc))
 		parentPkg = getParentPackage(parentPkg, doc)
 	}
 	pkgs = utils.TrimArray(pkgs)
