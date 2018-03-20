@@ -15,6 +15,24 @@ import (
 
 var GlobalFlags = []cli.Flag{
 	cli.StringFlag{
+		EnvVar: "GITHUB_OWNER",
+		Name:   "owner",
+		Value:  "FINTprosjektet",
+		Usage:  "Git repository containing model",
+	},
+	cli.StringFlag{
+		EnvVar: "GITHUB_PROJECT",
+		Name:   "repo",
+		Value:  "fint-informasjonsmodell",
+		Usage:  "Git repository containing model",
+	},
+	cli.StringFlag{
+		EnvVar: "MODEL_FILENAME",
+		Name:   "filename",
+		Value:  "FINT-informasjonsmodell.xml",
+		Usage:  "File name containing information model",
+	},
+	cli.StringFlag{
 		EnvVar: "",
 		Name:   "tag, t",
 		Value:  "latest",

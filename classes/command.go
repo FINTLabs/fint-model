@@ -2,6 +2,7 @@ package classes
 
 import (
 	"fmt"
+
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/parser"
 	"github.com/FINTprosjektet/fint-model/common/types"
@@ -11,12 +12,12 @@ import (
 func CmdPrintClasses(c *cli.Context) {
 	var tag string
 	if c.GlobalString("tag") == "latest" {
-		tag = github.GetLatest()
+		tag = github.GetLatest(c.GlobalString("owner"), c.GlobalString("repo"))
 	} else {
 		tag = c.GlobalString("tag")
 	}
 
-	clazzes, _, _, _:= parser.GetClasses(tag, c.GlobalBool("force"))
+	clazzes, _, _, _ := parser.GetClasses(c.GlobalString("owner"), c.GlobalString("repo"), tag, c.GlobalString("filename"), c.GlobalBool("force"))
 
 	for _, c := range clazzes {
 		dumpClass(c)
@@ -34,11 +35,11 @@ func dumpClass(c types.Class) {
 	if len(c.Extends) > 0 {
 		fmt.Printf("  Extends: %s\n", c.Extends)
 	}
-	fmt.Println("  Imports:", )
+	fmt.Println("  Imports:")
 	for _, i := range c.Imports {
 		fmt.Printf("    - %s\n", i)
 	}
-	fmt.Println("  Using:", )
+	fmt.Println("  Using:")
 	for _, u := range c.Using {
 		fmt.Printf("    - %s\n", u)
 	}

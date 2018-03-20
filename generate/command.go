@@ -2,49 +2,53 @@ package generate
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
+
 	"github.com/FINTprosjektet/fint-model/common/config"
 	"github.com/FINTprosjektet/fint-model/common/document"
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/parser"
-	"github.com/FINTprosjektet/fint-model/namespaces"
-	"github.com/codegangsta/cli"
-	"io/ioutil"
-	"os"
-	"strings"
 	"github.com/FINTprosjektet/fint-model/common/types"
+	"github.com/FINTprosjektet/fint-model/namespaces"
 	"github.com/FINTprosjektet/fint-model/packages"
+	"github.com/codegangsta/cli"
 )
 
 func CmdGenerate(c *cli.Context) {
 
 	var tag string
 	if c.GlobalString("tag") == config.DEFAULT_TAG {
-		tag = github.GetLatest()
+		tag = github.GetLatest(c.GlobalString("owner"), c.GlobalString("repo"))
 	} else {
 		tag = c.GlobalString("tag")
 	}
 	force := c.GlobalBool("force")
+	owner := c.GlobalString("owner")
+	repo := c.GlobalString("repo")
+	filename := c.GlobalString("filename")
 
 	if c.String("lang") == "JAVA" {
-		generateJavaCode(tag, force)
+		generateJavaCode(owner, repo, tag, filename, force)
 	}
 
 	if c.String("lang") == "CS" {
-		generateCSCode(tag, force)
+		generateCSCode(owner, repo, tag, filename, force)
 	}
 
 	if c.String("lang") == "ALL" {
-		generateCSCode(tag, force)
-		generateJavaCode(tag, force)
+		generateCSCode(owner, repo, tag, filename, force)
+		generateJavaCode(owner, repo, tag, filename, force)
 	}
 }
 
-func generateJavaCode(tag string, force bool) {
+func generateJavaCode(owner string, repo string, tag string, filename string, force bool) {
 
-	document.Get(tag, force)
+	document.Get(owner, repo, tag, filename, force)
 	fmt.Println("Generating Java code:")
-	setupJavaDirStructure(tag, force)
-	classes, _, packageClassMap, _ := parser.GetClasses(tag, force)
+	setupJavaDirStructure(owner, repo, tag, filename, force)
+	classes, _, packageClassMap, _ := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
 		class := GetJavaClass(c)
@@ -95,12 +99,12 @@ func getAction(p string, cl []types.Class, tag string) types.Action {
 	return action
 }
 
-func generateCSCode(tag string, force bool) {
+func generateCSCode(owner string, repo string, tag string, filename string, force bool) {
 
-	document.Get(tag, force)
+	document.Get(owner, repo, tag, filename, force)
 	fmt.Println("Generating CSharp code:")
-	setupCSDirStructure(tag, force)
-	classes, _, _, packageClassMap := parser.GetClasses(tag, force)
+	setupCSDirStructure(owner, repo, tag, filename, force)
+	classes, _, _, packageClassMap := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
 		fmt.Printf("  > Creating class: %s.cs\n", c.Name)
 
@@ -130,7 +134,7 @@ func generateCSCode(tag string, force bool) {
 
 }
 
-func setupCSDirStructure(tag string, force bool) {
+func setupCSDirStructure(owner string, repo string, tag string, filename string, force bool) {
 	fmt.Println("  > Setup directory structure.")
 	os.RemoveAll("net")
 	err := os.MkdirAll(config.CS_BASE_PATH, 0777)
@@ -138,7 +142,7 @@ func setupCSDirStructure(tag string, force bool) {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
-	for _, ns := range namespaces.DistinctNamespaceList(tag, force) {
+	for _, ns := range namespaces.DistinctNamespaceList(owner, repo, tag, filename, force) {
 		path := getCSPath(ns)
 		err := os.MkdirAll(path, 0777)
 		if err != nil {
@@ -156,7 +160,7 @@ func getCSPath(ns string) string {
 	return path
 }
 
-func setupJavaDirStructure(tag string, force bool) {
+func setupJavaDirStructure(owner string, repo string, tag string, filename string, force bool) {
 	fmt.Println("  > Setup directory structure.")
 	os.RemoveAll("java")
 	err := os.MkdirAll(config.JAVA_BASE_PATH, 0777)
@@ -165,7 +169,7 @@ func setupJavaDirStructure(tag string, force bool) {
 		fmt.Println(err)
 	}
 
-	for _, pkg := range packages.DistinctPackageList(tag, force) {
+	for _, pkg := range packages.DistinctPackageList(owner, repo, tag, filename, force) {
 		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
 		err := os.MkdirAll(removeJavaPackagePathFromFilePath(path), 0777)
 		if err != nil {

@@ -12,8 +12,8 @@ import (
 	"github.com/antchfx/xquery/xml"
 )
 
-func GetClasses(tag string, force bool) ([]types.Class, map[string]types.Import, map[string][]types.Class, map[string][]types.Class) {
-	doc := document.Get(tag, force)
+func GetClasses(owner string, repo string, tag string, filename string, force bool) ([]types.Class, map[string]types.Import, map[string][]types.Class, map[string][]types.Class) {
+	doc := document.Get(owner, repo, tag, filename, force)
 
 	var classes []types.Class
 	// TODO BUG: packageMap and classMap fail for classes with the same name!

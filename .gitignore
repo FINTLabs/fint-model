@@ -8,3 +8,4 @@ fint-model
 build
 fint-model.exe
 *.orig
+.vscode/
