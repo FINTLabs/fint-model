@@ -43,8 +43,6 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 		if len(class.Stereotype) == 0 {
 			if class.Abstract {
 				class.Stereotype = "abstrakt"
-			} else {
-				class.Stereotype = "datatype"
 			}
 		}
 
@@ -68,6 +66,13 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 		classes[i].Identifiable = identifiableFromExtends(classes[i], classMap)
 		javaPackageClassMap[classes[i].Package] = append(javaPackageClassMap[classes[i].Package], classes[i])
 		csPackageClassMap[classes[i].Namespace] = append(csPackageClassMap[classes[i].Namespace], classes[i])
+		if len(classes[i].Stereotype) == 0 {
+			if classes[i].Identifiable {
+				classes[i].Stereotype = "hovedklasse"
+			} else {
+				classes[i].Stereotype = "datatype"
+			}
+		}
 	}
 
 	return classes, packageMap, javaPackageClassMap, csPackageClassMap
