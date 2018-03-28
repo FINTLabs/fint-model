@@ -75,6 +75,23 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 		}
 	}
 
+	for i, c := range classes {
+		for _, a := range c.Attributes {
+			if typ, found := classMap[a.Type]; found {
+				if len(typ.Relations) > 0 {
+					if classes[i].Resources == nil {
+						classes[i].Resources = make(map[string]string)
+					}
+					if a.List {
+						classes[i].Resources[a.Name] = fmt.Sprintf("List<%sResource>", typ.Name)
+					} else {
+						classes[i].Resources[a.Name] = fmt.Sprintf("%sResource", typ.Name)
+					}
+				}
+			}
+		}
+	}
+
 	return classes, packageMap, javaPackageClassMap, csPackageClassMap
 }
 
@@ -299,12 +316,12 @@ func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []string {
 	var assocs []string
 	for _, rr := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role", c.SelectAttr("idref"))) {
 		if len(rr.SelectAttr("name")) > 0 {
-			assocs = append(assocs, strings.ToUpper(replaceNO(rr.SelectAttr("name"))))
+			assocs = append(assocs, replaceNO(rr.SelectAttr("name")))
 		}
 	}
 	for _, rl := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role", c.SelectAttr("idref"))) {
 		if len(rl.SelectAttr("name")) > 0 {
-			assocs = append(assocs, strings.ToUpper(replaceNO(rl.SelectAttr("name"))))
+			assocs = append(assocs, replaceNO(rl.SelectAttr("name")))
 		}
 	}
 	return assocs

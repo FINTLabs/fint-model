@@ -43,14 +43,34 @@ func dumpClass(c types.Class) {
 	for _, u := range c.Using {
 		fmt.Printf("    - %s\n", u)
 	}
-	for _, a := range c.Attributes {
-		fmt.Printf("  Attribute: %s\n", a.Name)
-		fmt.Printf("    Type: %s\n", a.Type)
-		fmt.Printf("    isList: %s\n", a.List)
-	}
-	fmt.Println("  Relations:")
-	for _, r := range c.Relations {
-		fmt.Printf("    - %s\n", r)
+
+	if len(c.Attributes) > 0 {
+		fmt.Println("  Attributes: ")
+		for _, a := range c.Attributes {
+			if a.List {
+				fmt.Printf("    - %s: List<%s>\n", a.Name, a.Type)
+			} else {
+				fmt.Printf("    - %s: %s\n", a.Name, a.Type)
+			}
+		}
 	}
 
+	if len(c.Relations) > 0 {
+		fmt.Print("  Relations: ")
+		for i, r := range c.Relations {
+			fmt.Print(r)
+			if i == len(c.Relations)-1 {
+				fmt.Println()
+			} else {
+				fmt.Print(", ")
+			}
+		}
+	}
+
+	if c.Resources != nil {
+		fmt.Println("  Resources:")
+		for k, v := range c.Resources {
+			fmt.Printf("    - %s: %s\n", k, v)
+		}
+	}
 }

@@ -12,7 +12,6 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/parser"
 	"github.com/FINTprosjektet/fint-model/common/types"
 	"github.com/FINTprosjektet/fint-model/namespaces"
-	"github.com/FINTprosjektet/fint-model/packages"
 	"github.com/codegangsta/cli"
 )
 
@@ -43,6 +42,16 @@ func CmdGenerate(c *cli.Context) {
 	}
 }
 
+func writeFile(path string, filename string, content []byte) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = os.MkdirAll(path, 0777)
+		if err != nil {
+			return err
+		}
+	}
+	return ioutil.WriteFile(path+"/"+filename, content, 0777)
+}
+
 func generateJavaCode(owner string, repo string, tag string, filename string, force bool) {
 
 	document.Get(owner, repo, tag, filename, force)
@@ -50,11 +59,21 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 	setupJavaDirStructure(owner, repo, tag, filename, force)
 	classes, _, packageClassMap, _ := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
+		if c.Stereotype == "hovedklasse" {
+			fmt.Printf("  > Creating resource class: %sResource.java\n", c.Name)
+			class := GetJavaResourceClass(c)
+			pkg := strings.Replace(c.Package, "model", "model.resource", -1)
+			path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
+			err := writeFile(removeJavaPackagePathFromFilePath(path), c.Name+"Resource.java", []byte(class))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
+		}
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
 		class := GetJavaClass(c)
 
-		path := fmt.Sprintf("%s/%s/%s.java", config.JAVA_BASE_PATH, strings.Replace(c.Package, ".", "/", -1), c.Name)
-		err := ioutil.WriteFile(removeJavaPackagePathFromFilePath(path), []byte(class), 0777)
+		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(c.Package, ".", "/", -1))
+		err := writeFile(removeJavaPackagePathFromFilePath(path), c.Name+".java", []byte(class))
 		if err != nil {
 			fmt.Printf("Unable to write file: %s", err)
 		}
@@ -65,8 +84,8 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 		action := getAction(p, cl, tag)
 		fmt.Printf("  > Creating action: %s.java\n", action.Name)
 		actionEnum := GetJavaActionEnum(action)
-		path := fmt.Sprintf("%s/%s/%s.java", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1), action.Name)
-		err := ioutil.WriteFile(removeJavaPackagePathFromFilePath(path), []byte(actionEnum), 0777)
+		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1))
+		err := writeFile(removeJavaPackagePathFromFilePath(path), action.Name+".java", []byte(actionEnum))
 		if err != nil {
 			fmt.Printf("Unable to write file: %s", err)
 		}
@@ -169,13 +188,14 @@ func setupJavaDirStructure(owner string, repo string, tag string, filename strin
 		fmt.Println(err)
 	}
 
-	for _, pkg := range packages.DistinctPackageList(owner, repo, tag, filename, force) {
-		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
-		err := os.MkdirAll(removeJavaPackagePathFromFilePath(path), 0777)
-		if err != nil {
-			fmt.Println("Unable to create packages structure")
-			fmt.Println(err)
+	/*
+		for _, pkg := range packages.DistinctPackageList(owner, repo, tag, filename, force) {
+			path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
+			err := os.MkdirAll(removeJavaPackagePathFromFilePath(path), 0777)
+			if err != nil {
+				fmt.Println("Unable to create packages structure")
+				fmt.Println(err)
+			}
 		}
-	}
-
+	*/
 }

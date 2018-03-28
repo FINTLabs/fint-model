@@ -10,9 +10,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.NonNull;
 import java.util.List;
-import no.fint.model.*;
-
-{{- if .Imports }}
+import no.fint.model.{{ javaType .Stereotype }};
+{{- if .Imports -}}
 {{ range $i := .Imports }}
 import {{ $i }};
 {{- end -}}
