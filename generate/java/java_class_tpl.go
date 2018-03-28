@@ -32,7 +32,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     {{ $c := sub (len .Relations) 1 -}}
     public enum Relasjonsnavn {
         {{- range $i, $rel := .Relations }}
-            {{ $rel }}{{ if ne $i $c }},{{ end -}}
+            {{ upperCase $rel }}{{ if ne $i $c }},{{ end -}}
         {{ end }}
     }
 {{ end -}}

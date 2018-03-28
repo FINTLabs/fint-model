@@ -12,10 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
@@ -31,31 +30,36 @@ import {{ $i }};
 @EqualsAndHashCode(callSuper=true)
 @ToString(callSuper=true)
 public class {{ .Name }}Resource extends {{ .Name }} implements FintLinks {
-
-    @Getter
-    private final Map<String, List<Link>> links = Collections.synchronizedMap(new LinkedHashMap<>());
-
-{{- if .Relations }}
-    {{ range $i, $rel := .Relations }}
-    public void add{{ upperCaseFirst $rel }}(Link link) {
-        addLink("{{$rel}}", link);
-    }
-    {{ end }}
-{{ end -}}
-{{ if .Resources }}
-    {{ range $att,$typ := .Resources }}
+{{- if .Resources }}
+    // Resources
+    {{- range $att,$typ := .Resources }}
     @Getter
     private {{$typ}} {{$att}};
+    {{- end }}
+
+    {{- range $att,$typ := .Resources }}
     @JsonSetter
-    public void set{{ upperCaseFirst $att }}({{ $typ }} {{ $att }}) {
-        this.{{$att}} = {{$att}};
+    public void set{{ upperCaseFirst $att }}({{ $typ }} _{{ $att }}) {
+        this.{{$att}} = _{{$att}};
     }
     @JsonIgnore
     @Override
-    public void set{{ upperCaseFirst $att }}({{ baseType $typ }} {{$att}}) {
-        this.{{$att}} = new {{$typ}}({{$att}});
+    public void set{{ upperCaseFirst $att }}({{ baseType $typ }} _{{$att}}) {
+        this.{{$att}} = {{ assignResource $typ $att }};
     }
-    {{ end }}
+    {{- end }}
 {{- end }}
+
+    // Links
+    @Getter
+    private final Map<String, List<Link>> links = createLinks();
+
+    {{- if .Relations }}
+        {{ range $i, $rel := .Relations }}
+    public void add{{ upperCaseFirst $rel }}(Link link) {
+        addLink("{{$rel}}", link);
+    }
+        {{- end }}
+    {{- end }}
 }
 `

@@ -79,6 +79,11 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 		for _, a := range c.Attributes {
 			if typ, found := classMap[a.Type]; found {
 				if len(typ.Relations) > 0 {
+					for _, p := range c.Imports {
+						if strings.HasSuffix(p, "."+typ.Name) {
+							classes[i].Imports = append(classes[i].Imports, strings.Replace(p, "model", "model.resource", -1)+"Resource")
+						}
+					}
 					if classes[i].Resources == nil {
 						classes[i].Resources = make(map[string]string)
 					}
