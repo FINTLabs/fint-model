@@ -39,6 +39,12 @@ var funcMap = template.FuncMap{
 		}
 		return fmt.Sprintf("new %s(_%s)", typ, att)
 	},
+	"listAdder": func(typ string) string {
+		if strings.HasPrefix(typ, "List<") {
+			return "All"
+		}
+		return ""
+	},
 }
 
 func GetJavaResourceClass(c types.Class) string {

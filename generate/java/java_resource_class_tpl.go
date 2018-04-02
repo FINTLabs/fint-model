@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,7 +38,15 @@ public class {{ .Name }}Resource extends {{ .Name }} implements FintLinks {
     private {{$typ}} {{$att}};
     {{- end }}
 
-    {{- range $att,$typ := .Resources }}
+    @Override
+    public List<FintLinks> getNestedResources() {
+        List<FintLinks> result = new ArrayList<>();
+        {{- range $att,$typ := .Resources }}
+        result.add{{ listAdder $typ}}({{$att}});
+        {{- end }}
+        return result;
+    }
+    {{ range $att,$typ := .Resources }}
     @JsonSetter
     public void set{{ upperCaseFirst $att }}({{ $typ }} _{{ $att }}) {
         this.{{$att}} = _{{$att}};
