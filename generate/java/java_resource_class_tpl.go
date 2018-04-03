@@ -38,6 +38,7 @@ public class {{ .Name }}Resource extends {{ .Name }} implements FintLinks {
     private {{$typ}} {{$att}};
     {{- end }}
 
+    @JsonIgnore
     @Override
     public List<FintLinks> getNestedResources() {
         List<FintLinks> result = new ArrayList<>();
