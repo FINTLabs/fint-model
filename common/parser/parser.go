@@ -76,7 +76,17 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 	}
 
 	for i, c := range classes {
-		for _, a := range c.Attributes {
+		classes[i].AllAttributes = classes[i].Attributes
+		extd := c.Extends
+		for len(extd) > 0 {
+			clz := classMap[extd]
+			classes[i].AllAttributes = append(classes[i].AllAttributes, clz.Attributes...)
+			extd = clz.Extends
+		}
+	}
+
+	for i, c := range classes {
+		for _, a := range c.AllAttributes {
 			if typ, found := classMap[a.Type]; found {
 				if len(typ.Relations) > 0 {
 					for _, p := range c.Imports {

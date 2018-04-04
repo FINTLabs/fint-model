@@ -31,13 +31,14 @@ var funcMap = template.FuncMap{
 	},
 	"upperCase":      func(s string) string { return strings.ToUpper(s) },
 	"upperCaseFirst": func(s string) string { return strings.Title(s) },
+	"getter":         func(s string) string { return "get" + strings.Title(s) + "()" },
 	"baseType":       func(s string) string { return strings.Replace(s, "Resource", "", -1) },
 	"assignResource": func(typ string, att string) string {
 		if strings.HasPrefix(typ, "List<") {
 			inner := strings.TrimSuffix(strings.TrimPrefix(typ, "List<"), ">")
-			return fmt.Sprintf("_%s == null ? null : _%s.stream().map(%s::new).collect(Collectors.toList())", att, att, inner)
+			return fmt.Sprintf("%s.stream().map(%s::create).collect(Collectors.toList())", att, inner)
 		}
-		return fmt.Sprintf("new %s(_%s)", typ, att)
+		return fmt.Sprintf("%s.create(%s)", typ, att)
 	},
 	"listAdder": func(typ string) string {
 		if strings.HasPrefix(typ, "List<") {

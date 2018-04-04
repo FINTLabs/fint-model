@@ -10,6 +10,7 @@ type Class struct {
 	Using         []string
 	Documentation string
 	Attributes    []Attribute
+	AllAttributes []Attribute
 	Relations     []string
 	Resources     map[string]string
 	Identifiable  bool

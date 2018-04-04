@@ -31,33 +31,41 @@ import {{ $i }};
 @EqualsAndHashCode(callSuper=true)
 @ToString(callSuper=true)
 public class {{ .Name }}Resource extends {{ .Name }} implements FintLinks {
+    public static {{.Name}}Resource create({{.Name}} other) {
+        if (other == null) {
+            return null;
+        }
+        if (other instanceof {{.Name}}Resource) {
+            return other;
+        }
+        {{.Name}}Resource result = new {{.Name}}Resource();
+        {{- range $att := .AllAttributes }}
+        result.set{{ upperCaseFirst $att.Name }}(other.get{{ upperCaseFirst $att.Name }}());
+        {{- end }}
+        return result;
+    }
+
 {{- if .Resources }}
     // Resources
-    {{- range $att,$typ := .Resources }}
-    @Getter
-    private {{$typ}} {{$att}};
-    {{- end }}
-
     @JsonIgnore
     @Override
     public List<FintLinks> getNestedResources() {
         List<FintLinks> result = new ArrayList<>();
         {{- range $att,$typ := .Resources }}
-        result.add{{ listAdder $typ}}({{$att}});
+        if ({{ getter $att }} != null) {
+            result.add{{ listAdder $typ}}({{ getter $att | assignResource $typ }});
+        }
         {{- end }}
         return result;
     }
     {{ range $att,$typ := .Resources }}
     @JsonSetter
-    public void set{{ upperCaseFirst $att }}({{ $typ }} _{{ $att }}) {
-        this.{{$att}} = _{{$att}};
-    }
-    @JsonIgnore
     @Override
-    public void set{{ upperCaseFirst $att }}({{ baseType $typ }} _{{$att}}) {
-        this.{{$att}} = {{ assignResource $typ $att }};
+    public void set{{ upperCaseFirst $att }}({{ baseType $typ }} {{$att}}) {
+        super.set{{ upperCaseFirst $att }}({{ assignResource $typ $att }});
     }
     {{- end }}
+
 {{- end }}
 
     // Links

@@ -54,6 +54,16 @@ func dumpClass(c types.Class) {
 			}
 		}
 	}
+	if len(c.AllAttributes) > 0 {
+		fmt.Println("  All Attributes: ")
+		for _, a := range c.AllAttributes {
+			if a.List {
+				fmt.Printf("    - %s: List<%s>\n", a.Name, a.Type)
+			} else {
+				fmt.Printf("    - %s: %s\n", a.Name, a.Type)
+			}
+		}
+	}
 
 	if len(c.Relations) > 0 {
 		fmt.Print("  Relations: ")

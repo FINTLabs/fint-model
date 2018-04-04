@@ -59,7 +59,7 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 	setupJavaDirStructure(owner, repo, tag, filename, force)
 	classes, _, packageClassMap, _ := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
-		if c.Stereotype == "hovedklasse" {
+		if c.Stereotype == "hovedklasse" || c.Stereotype == "datatype" {
 			fmt.Printf("  > Creating resource class: %sResource.java\n", c.Name)
 			class := GetJavaResourceClass(c)
 			pkg := strings.Replace(c.Package, "model", "model.resource", -1)
