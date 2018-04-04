@@ -36,7 +36,7 @@ public class {{ .Name }}Resource extends {{ .Name }} implements FintLinks {
             return null;
         }
         if (other instanceof {{.Name}}Resource) {
-            return other;
+            return ({{.Name}}Resource)other;
         }
         {{.Name}}Resource result = new {{.Name}}Resource();
         {{- range $att := .AllAttributes }}
