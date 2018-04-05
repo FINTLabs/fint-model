@@ -12,21 +12,21 @@ import (
 	"github.com/antchfx/xquery/xml"
 )
 
-func GetClasses(owner string, repo string, tag string, filename string, force bool) ([]types.Class, map[string]types.Import, map[string][]types.Class, map[string][]types.Class) {
+func GetClasses(owner string, repo string, tag string, filename string, force bool) ([]*types.Class, map[string]types.Import, map[string][]*types.Class, map[string][]*types.Class) {
 	doc := document.Get(owner, repo, tag, filename, force)
 
-	var classes []types.Class
+	var classes []*types.Class
 	// TODO BUG: packageMap and classMap fail for classes with the same name!
 	packageMap := make(map[string]types.Import)
-	classMap := make(map[string]types.Class)
-	javaPackageClassMap := make(map[string][]types.Class)
-	csPackageClassMap := make(map[string][]types.Class)
+	classMap := make(map[string]*types.Class)
+	javaPackageClassMap := make(map[string][]*types.Class)
+	csPackageClassMap := make(map[string][]*types.Class)
 
 	classElements := xmlquery.Find(doc, "//element[@type='Class']")
 	for _, c := range classElements {
 
 		properties := c.SelectElement("properties")
-		var class types.Class
+		class := new(types.Class)
 
 		class.Name = replaceNO(c.SelectAttr("name"))
 		class.Abstract = toBool(properties.SelectAttr("isAbstract"))
@@ -60,49 +60,36 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 		Java: "java.util.Date",
 	}
 
-	for i := range classes {
-		classes[i].Imports = getImports(classes[i], packageMap)
-		classes[i].Using = getUsing(classes[i], packageMap)
-		classes[i].Identifiable = identifiableFromExtends(classes[i], classMap)
-		javaPackageClassMap[classes[i].Package] = append(javaPackageClassMap[classes[i].Package], classes[i])
-		csPackageClassMap[classes[i].Namespace] = append(csPackageClassMap[classes[i].Namespace], classes[i])
-		if len(classes[i].Stereotype) == 0 {
-			if classes[i].Identifiable {
-				classes[i].Stereotype = "hovedklasse"
+	for _, class := range classes {
+		class.Imports = getImports(class, packageMap)
+		class.Using = getUsing(class, packageMap)
+		class.Identifiable = identifiableFromExtends(class, classMap)
+		class.Resource = isResource(class, classMap)
+		javaPackageClassMap[class.Package] = append(javaPackageClassMap[class.Package], class)
+		csPackageClassMap[class.Namespace] = append(csPackageClassMap[class.Namespace], class)
+		if len(class.Stereotype) == 0 {
+			if class.Identifiable {
+				class.Stereotype = "hovedklasse"
 			} else {
-				classes[i].Stereotype = "datatype"
+				class.Stereotype = "datatype"
 			}
 		}
 	}
 
-	for i, c := range classes {
-		classes[i].AllAttributes = classes[i].Attributes
-		extd := c.Extends
-		for len(extd) > 0 {
-			clz := classMap[extd]
-			classes[i].AllAttributes = append(classes[i].AllAttributes, clz.Attributes...)
-			extd = clz.Extends
+	for _, class := range classes {
+		for _, a := range class.Attributes {
+			if typ, found := classMap[a.Type]; found {
+				if typ.Resource {
+					class.Resources = append(class.Resources, a)
+				}
+			}
 		}
 	}
 
-	for i, c := range classes {
-		for _, a := range c.AllAttributes {
-			if typ, found := classMap[a.Type]; found {
-				if len(typ.Relations) > 0 {
-					for _, p := range c.Imports {
-						if strings.HasSuffix(p, "."+typ.Name) {
-							classes[i].Imports = append(classes[i].Imports, strings.Replace(p, "model", "model.resource", -1)+"Resource")
-						}
-					}
-					if classes[i].Resources == nil {
-						classes[i].Resources = make(map[string]string)
-					}
-					if a.List {
-						classes[i].Resources[a.Name] = fmt.Sprintf("List<%sResource>", typ.Name)
-					} else {
-						classes[i].Resources[a.Name] = fmt.Sprintf("%sResource", typ.Name)
-					}
-				}
+	for _, class := range classes {
+		if len(class.Extends) > 0 {
+			if typ, found := classMap[class.Extends]; found {
+				class.ExtendsResource = typ.Resource || len(typ.Resources) > 0
 			}
 		}
 	}
@@ -110,7 +97,17 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 	return classes, packageMap, javaPackageClassMap, csPackageClassMap
 }
 
-func identifiableFromExtends(class types.Class, classMap map[string]types.Class) bool {
+func isResource(class *types.Class, classMap map[string]*types.Class) bool {
+	if len(class.Relations) > 0 {
+		return true
+	}
+	if len(class.Extends) > 0 {
+		return isResource(classMap[class.Extends], classMap)
+	}
+	return false
+}
+
+func identifiableFromExtends(class *types.Class, classMap map[string]*types.Class) bool {
 	if class.Identifiable {
 		return true
 	}
@@ -132,7 +129,7 @@ func identifiable(attribs []types.Attribute) bool {
 
 }
 
-func getImports(c types.Class, imports map[string]types.Import) []string {
+func getImports(c *types.Class, imports map[string]types.Import) []string {
 
 	attribs := c.Attributes
 	var imps []string
@@ -150,7 +147,7 @@ func getImports(c types.Class, imports map[string]types.Import) []string {
 	return utils.Distinct(utils.TrimArray(imps))
 }
 
-func getUsing(c types.Class, imports map[string]types.Import) []string {
+func getUsing(c *types.Class, imports map[string]types.Import) []string {
 
 	attribs := c.Attributes
 	var imps []string

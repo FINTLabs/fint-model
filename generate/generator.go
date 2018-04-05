@@ -13,8 +13,24 @@ import (
 
 var funcMap = template.FuncMap{
 	//"add": func(i int, ii int) int { return i + ii },
-	"sub":         func(i int, ii int) int { return i - ii },
-	"resourcePkg": func(s string) string { return strings.Replace(s, "model", "model.resource", -1) },
+	"sub": func(i int, ii int) int { return i - ii },
+	"resourcePkg": func(s string) string {
+		return strings.Replace(s, "model", "model.resource", -1)
+	},
+	"resource": func(resources []types.Attribute, s string) string {
+		for _, a := range resources {
+			if strings.HasSuffix(s, a.Type) {
+				return strings.Replace(s, "model", "model.resource", -1) + "Resource"
+			}
+		}
+		return s
+	},
+	"extends": func(isResource bool, extends string, s string) string {
+		if isResource && strings.HasSuffix(s, extends) {
+			return strings.Replace(s, "model", "model.resource", -1) + "Resource"
+		}
+		return s
+	},
 	"listFilt": func(list bool, s string) string {
 		if list {
 			return fmt.Sprintf("List<%s>", s)
@@ -48,11 +64,11 @@ var funcMap = template.FuncMap{
 	},
 }
 
-func GetJavaResourceClass(c types.Class) string {
+func GetJavaResourceClass(c *types.Class) string {
 	return getClass(c, java.RESOURCE_CLASS_TEMPLATE)
 }
 
-func GetJavaClass(c types.Class) string {
+func GetJavaClass(c *types.Class) string {
 	return getClass(c, java.CLASS_TEMPLATE)
 }
 
@@ -64,11 +80,11 @@ func GetCSActionEnum(a types.Action) string {
 	return getActionEnum(a, cs.ACTION_ENUM_TEMPLATE)
 }
 
-func GetCSClass(c types.Class) string {
+func GetCSClass(c *types.Class) string {
 	return getClass(c, cs.CLASS_TEMPLATE)
 }
 
-func getClass(c types.Class, t string) string {
+func getClass(c *types.Class, t string) string {
 	tpl := template.New("class").Funcs(funcMap)
 
 	parse, err := tpl.Parse(t)

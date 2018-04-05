@@ -59,7 +59,7 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 	setupJavaDirStructure(owner, repo, tag, filename, force)
 	classes, _, packageClassMap, _ := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
-		if c.Stereotype == "hovedklasse" || c.Stereotype == "datatype" {
+		if c.Resource || len(c.Resources) > 0 {
 			fmt.Printf("  > Creating resource class: %sResource.java\n", c.Name)
 			class := GetJavaResourceClass(c)
 			pkg := strings.Replace(c.Package, "model", "model.resource", -1)
@@ -99,7 +99,7 @@ func removeJavaPackagePathFromFilePath(path string) string {
 	return strings.Replace(path, "no/fint/model/", "", -1)
 }
 
-func getAction(p string, cl []types.Class, tag string) types.Action {
+func getAction(p string, cl []*types.Class, tag string) types.Action {
 	var action types.Action
 
 	packageList := strings.Split(p, ".")
