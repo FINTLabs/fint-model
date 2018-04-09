@@ -68,6 +68,10 @@ func GetJavaResourceClass(c *types.Class) string {
 	return getClass(c, java.RESOURCE_CLASS_TEMPLATE)
 }
 
+func GetJavaResourcesClass(c *types.Class) string {
+	return getClass(c, java.RESOURCES_CLASS_TEMPLATE)
+}
+
 func GetJavaClass(c *types.Class) string {
 	return getClass(c, java.CLASS_TEMPLATE)
 }

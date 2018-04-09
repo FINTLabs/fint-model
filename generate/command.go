@@ -52,6 +52,11 @@ func writeFile(path string, filename string, content []byte) error {
 	return ioutil.WriteFile(path+"/"+filename, content, 0777)
 }
 
+func writeJavaClass(pkg string, class string, content []byte) error {
+	path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
+	return writeFile(removeJavaPackagePathFromFilePath(path), class+".java", []byte(content))
+}
+
 func generateJavaCode(owner string, repo string, tag string, filename string, force bool) {
 
 	document.Get(owner, repo, tag, filename, force)
@@ -63,17 +68,21 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 			fmt.Printf("  > Creating resource class: %sResource.java\n", c.Name)
 			class := GetJavaResourceClass(c)
 			pkg := strings.Replace(c.Package, "model", "model.resource", -1)
-			path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
-			err := writeFile(removeJavaPackagePathFromFilePath(path), c.Name+"Resource.java", []byte(class))
+			err := writeJavaClass(pkg, c.Name+"Resource", []byte(class))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
+
+			fmt.Printf("  > Creating resources class: %sResources.java\n", c.Name)
+			class = GetJavaResourcesClass(c)
+			err = writeJavaClass(pkg, c.Name+"Resources", []byte(class))
 			if err != nil {
 				fmt.Printf("Unable to write file: %s", err)
 			}
 		}
 		fmt.Printf("  > Creating class: %s.java\n", c.Name)
 		class := GetJavaClass(c)
-
-		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(c.Package, ".", "/", -1))
-		err := writeFile(removeJavaPackagePathFromFilePath(path), c.Name+".java", []byte(class))
+		err := writeJavaClass(c.Package, c.Name, []byte(class))
 		if err != nil {
 			fmt.Printf("Unable to write file: %s", err)
 		}
