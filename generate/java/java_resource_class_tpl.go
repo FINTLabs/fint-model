@@ -5,7 +5,6 @@ const RESOURCE_CLASS_TEMPLATE = `// Built from tag {{ .GitTag }}
 package {{ resourcePkg .Package }};
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSetter;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,10 +13,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.ToString;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import no.fint.model.{{ javaType .Stereotype }};
 import no.fint.model.resource.FintLinks;
@@ -70,6 +68,11 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
 
     {{- if .Relations }}
         {{ range $i, $rel := .Relations }}
+
+    @JsonIgnore
+    public List<Link> get{{ upperCaseFirst $rel }}() {
+        return getLinks().getOrDefault("{{$rel}}", Collections.emptyList()); 
+    }
     public void add{{ upperCaseFirst $rel }}(Link link) {
         addLink("{{$rel}}", link);
     }
