@@ -1,0 +1,54 @@
+package cs
+
+const RESOURCE_CLASS_TEMPLATE = `// Built from tag {{ .GitTag }}
+
+using System.Collections.Generic;
+using FINT.Model.Resource;
+using Newtonsoft.Json;
+
+{{- if .Using }}
+{{ range $u := .Using }}
+using {{ $u }};
+{{- end -}}
+{{ end }}
+
+namespace {{ .Namespace }}
+{
+
+	public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} : {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end }}
+	{
+
+        {{ if .Attributes }}
+		{{ range $att := .Attributes -}}
+		public {{ csType $att.Type $att.Optional | resource $.Resources | listFilt $att.List }} {{ upperCaseFirst $att.Name }} { get; set; }
+		{{ end -}}
+    	{{ end }}
+        
+        public {{.Name}}Resource()
+        {
+            Links = new Dictionary<string, List<Link>>();
+        }
+
+        [JsonProperty(PropertyName = "_links")]
+        public new Dictionary<string, List<Link>> Links { get; private set; }
+        
+        private void AddLink(string key, Link link)
+        {
+            if (Links.ContainsKey(key)) return;
+
+            Links.Add(key, new List<Link>());
+            Links[key].Add(link);
+        }
+        
+        {{- if .Relations }}
+            {{ range $i, $rel := .Relations }}
+
+        public void Add{{ upperCaseFirst $rel }}(Link link)
+        {
+            AddLink("{{$rel}}", link);
+        }
+            {{- end }}
+        {{- end }}
+    }
+}
+`

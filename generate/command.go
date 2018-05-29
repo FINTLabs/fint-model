@@ -11,7 +11,6 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/parser"
 	"github.com/FINTprosjektet/fint-model/common/types"
-	"github.com/FINTprosjektet/fint-model/namespaces"
 	"github.com/codegangsta/cli"
 )
 
@@ -28,17 +27,19 @@ func CmdGenerate(c *cli.Context) {
 	repo := c.GlobalString("repo")
 	filename := c.GlobalString("filename")
 
+	resource := c.Bool("resource")
+
 	if c.String("lang") == "JAVA" {
-		generateJavaCode(owner, repo, tag, filename, force)
+		generateJavaCode(owner, repo, tag, filename, force, resource)
 	}
 
 	if c.String("lang") == "CS" {
-		generateCSCode(owner, repo, tag, filename, force)
+		generateCSCode(owner, repo, tag, filename, force, resource)
 	}
 
 	if c.String("lang") == "ALL" {
-		generateCSCode(owner, repo, tag, filename, force)
-		generateJavaCode(owner, repo, tag, filename, force)
+		generateCSCode(owner, repo, tag, filename, force, resource)
+		generateJavaCode(owner, repo, tag, filename, force, resource)
 	}
 }
 
@@ -57,14 +58,14 @@ func writeJavaClass(pkg string, class string, content []byte) error {
 	return writeFile(removeJavaPackagePathFromFilePath(path), class+".java", []byte(content))
 }
 
-func generateJavaCode(owner string, repo string, tag string, filename string, force bool) {
+func generateJavaCode(owner string, repo string, tag string, filename string, force bool, resource bool) {
 
 	document.Get(owner, repo, tag, filename, force)
 	fmt.Println("Generating Java code:")
 	setupJavaDirStructure(owner, repo, tag, filename, force)
 	classes, _, packageClassMap, _ := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
-		if c.Resource || len(c.Resources) > 0 {
+		if resource && (c.Resource || len(c.Resources) > 0) {
 			fmt.Printf("  > Creating resource class: %sResource.java\n", c.Name)
 			class := GetJavaResourceClass(c)
 			pkg := strings.Replace(c.Package, "model", "model.resource", -1)
@@ -79,14 +80,15 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 			if err != nil {
 				fmt.Printf("Unable to write file: %s", err)
 			}
-		}
-		fmt.Printf("  > Creating class: %s.java\n", c.Name)
-		class := GetJavaClass(c)
-		err := writeJavaClass(c.Package, c.Name, []byte(class))
-		if err != nil {
-			fmt.Printf("Unable to write file: %s", err)
-		}
 
+		} else {
+			fmt.Printf("  > Creating class: %s.java\n", c.Name)
+			class := GetJavaClass(c)
+			err := writeJavaClass(c.Package, c.Name, []byte(class))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
+		}
 	}
 
 	for p, cl := range packageClassMap {
@@ -127,31 +129,51 @@ func getAction(p string, cl []*types.Class, tag string) types.Action {
 	return action
 }
 
-func generateCSCode(owner string, repo string, tag string, filename string, force bool) {
+func writeCSClass(namespace string, class string, content []byte) error {
+	return writeFile(getCSPath(namespace), class+".cs", []byte(content))
+}
+
+func generateCSCode(owner string, repo string, tag string, filename string, force bool, resource bool) {
 
 	document.Get(owner, repo, tag, filename, force)
 	fmt.Println("Generating CSharp code:")
 	setupCSDirStructure(owner, repo, tag, filename, force)
 	classes, _, _, packageClassMap := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
-		fmt.Printf("  > Creating class: %s.cs\n", c.Name)
 
-		class := GetCSClass(c)
+		if resource && (c.Resource || len(c.Resources) > 0) {
+			fmt.Printf("  > Creating resource class: %sResource.cs\n", c.Name)
+			class := GetCSResourceClass(c)
+			err := writeCSClass(c.Namespace, c.Name+"Resource", []byte(class))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
 
-		path := fmt.Sprintf("%s/%s.cs", getCSPath(c.Namespace), c.Name)
-		err := ioutil.WriteFile(path, []byte(class), 0777)
-		if err != nil {
-			fmt.Printf("Unable to write file: %s", err)
+			fmt.Printf("  > Creating resources class: %sResources.cs\n", c.Name)
+			class = GetCSResourcesClass(c)
+			err = writeCSClass(c.Namespace, c.Name+"Resources", []byte(class))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
+
+		} else {
+
+			fmt.Printf("  > Creating class: %s.cs\n", c.Name)
+
+			class := GetCSClass(c)
+
+			err := writeCSClass(c.Namespace, c.Name, []byte(class))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
 		}
-
 	}
 
 	for p, cl := range packageClassMap {
 		action := getAction(p, cl, tag)
 		fmt.Printf("  > Creating action: %s.cs\n", action.Name)
 		actionEnum := GetCSActionEnum(action)
-		path := fmt.Sprintf("%s/%s.cs", getCSPath(p), action.Name)
-		err := ioutil.WriteFile(path, []byte(actionEnum), 0777)
+		err := writeCSClass(p, action.Name, []byte(actionEnum))
 		if err != nil {
 			fmt.Printf("Unable to write file: %s", err)
 		}
@@ -164,20 +186,23 @@ func generateCSCode(owner string, repo string, tag string, filename string, forc
 
 func setupCSDirStructure(owner string, repo string, tag string, filename string, force bool) {
 	fmt.Println("  > Setup directory structure.")
-	os.RemoveAll("net")
+	os.RemoveAll("cs")
 	err := os.MkdirAll(config.CS_BASE_PATH, 0777)
 	if err != nil {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
-	for _, ns := range namespaces.DistinctNamespaceList(owner, repo, tag, filename, force) {
-		path := getCSPath(ns)
-		err := os.MkdirAll(path, 0777)
-		if err != nil {
-			fmt.Println("Unable to create namespace structure")
-			fmt.Println(err)
+
+	/*
+		for _, ns := range namespaces.DistinctNamespaceList(owner, repo, tag, filename, force) {
+			path := getCSPath(ns)
+			err := os.MkdirAll(path, 0777)
+			if err != nil {
+				fmt.Println("Unable to create namespace structure")
+				fmt.Println(err)
+			}
 		}
-	}
+	*/
 }
 func getCSPath(ns string) string {
 	nsList := strings.Split(ns, ".")

@@ -62,6 +62,11 @@ var Commands = []cli.Command{
 				Value: "JAVA",
 				Usage: "the language to generate the code in - can be JAVA, CS or ALL",
 			},
+			cli.BoolFlag{
+				EnvVar: "",
+				Name:   "resource, r",
+				Usage:  "Generate resource classes.",
+			},
 		},
 	},
 	{

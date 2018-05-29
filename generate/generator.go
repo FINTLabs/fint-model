@@ -80,6 +80,14 @@ func GetJavaActionEnum(a types.Action) string {
 	return getActionEnum(a, java.ACTION_ENUM_TEMPLATE)
 }
 
+func GetCSResourceClass(c *types.Class) string {
+	return getClass(c, cs.RESOURCE_CLASS_TEMPLATE)
+}
+
+func GetCSResourcesClass(c *types.Class) string {
+	return getClass(c, cs.RESOURCES_CLASS_TEMPLATE)
+}
+
 func GetCSActionEnum(a types.Action) string {
 	return getActionEnum(a, cs.ACTION_ENUM_TEMPLATE)
 }
