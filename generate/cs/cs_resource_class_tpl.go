@@ -2,9 +2,10 @@ package cs
 
 const RESOURCE_CLASS_TEMPLATE = `// Built from tag {{ .GitTag }}
 
+using System;
 using System.Collections.Generic;
-using FINT.Model.Resource;
 using Newtonsoft.Json;
+using FINT.Model.Resource;
 
 {{- if .Using }}
 {{ range $u := .Using }}
@@ -30,13 +31,14 @@ namespace {{ .Namespace }}
         }
 
         [JsonProperty(PropertyName = "_links")]
-        public new Dictionary<string, List<Link>> Links { get; private set; }
+        public {{- if .Extends }} new {{- end }} Dictionary<string, List<Link>> Links { get; private set; }
         
         private void AddLink(string key, Link link)
         {
-            if (Links.ContainsKey(key)) return;
-
-            Links.Add(key, new List<Link>());
+            if (!Links.ContainsKey(key))
+            {
+                Links.Add(key, new List<Link>());
+            }
             Links[key].Add(link);
         }
         

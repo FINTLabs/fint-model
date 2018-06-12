@@ -65,20 +65,22 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 	setupJavaDirStructure(owner, repo, tag, filename, force)
 	classes, _, packageClassMap, _ := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
-		if resource && (c.Resource || len(c.Resources) > 0) {
-			fmt.Printf("  > Creating resource class: %sResource.java\n", c.Name)
-			class := GetJavaResourceClass(c)
-			pkg := strings.Replace(c.Package, "model", "model.resource", -1)
-			err := writeJavaClass(pkg, c.Name+"Resource", []byte(class))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
-			}
+		if resource {
+			if c.Resource || len(c.Resources) > 0 {
+				fmt.Printf("  > Creating resource class: %sResource.java\n", c.Name)
+				class := GetJavaResourceClass(c)
+				pkg := strings.Replace(c.Package, "model", "model.resource", -1)
+				err := writeJavaClass(pkg, c.Name+"Resource", []byte(class))
+				if err != nil {
+					fmt.Printf("Unable to write file: %s", err)
+				}
 
-			fmt.Printf("  > Creating resources class: %sResources.java\n", c.Name)
-			class = GetJavaResourcesClass(c)
-			err = writeJavaClass(pkg, c.Name+"Resources", []byte(class))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
+				fmt.Printf("  > Creating resources class: %sResources.java\n", c.Name)
+				class = GetJavaResourcesClass(c)
+				err = writeJavaClass(pkg, c.Name+"Resources", []byte(class))
+				if err != nil {
+					fmt.Printf("Unable to write file: %s", err)
+				}
 			}
 
 		} else {
@@ -91,16 +93,18 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 		}
 	}
 
-	for p, cl := range packageClassMap {
-		action := getAction(p, cl, tag)
-		fmt.Printf("  > Creating action: %s.java\n", action.Name)
-		actionEnum := GetJavaActionEnum(action)
-		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1))
-		err := writeFile(removeJavaPackagePathFromFilePath(path), action.Name+".java", []byte(actionEnum))
-		if err != nil {
-			fmt.Printf("Unable to write file: %s", err)
-		}
+	if !resource {
+		for p, cl := range packageClassMap {
+			action := getAction(p, cl, tag)
+			fmt.Printf("  > Creating action: %s.java\n", action.Name)
+			actionEnum := GetJavaActionEnum(action)
+			path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1))
+			err := writeFile(removeJavaPackagePathFromFilePath(path), action.Name+".java", []byte(actionEnum))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
 
+		}
 	}
 
 	fmt.Println("Finish generating Java code!")
@@ -141,19 +145,21 @@ func generateCSCode(owner string, repo string, tag string, filename string, forc
 	classes, _, _, packageClassMap := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
 
-		if resource && (c.Resource || len(c.Resources) > 0) {
-			fmt.Printf("  > Creating resource class: %sResource.cs\n", c.Name)
-			class := GetCSResourceClass(c)
-			err := writeCSClass(c.Namespace, c.Name+"Resource", []byte(class))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
-			}
+		if resource {
+			if c.Resource || len(c.Resources) > 0 {
+				fmt.Printf("  > Creating resource class: %sResource.cs\n", c.Name)
+				class := GetCSResourceClass(c)
+				err := writeCSClass(c.Namespace, c.Name+"Resource", []byte(class))
+				if err != nil {
+					fmt.Printf("Unable to write file: %s", err)
+				}
 
-			fmt.Printf("  > Creating resources class: %sResources.cs\n", c.Name)
-			class = GetCSResourcesClass(c)
-			err = writeCSClass(c.Namespace, c.Name+"Resources", []byte(class))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
+				fmt.Printf("  > Creating resources class: %sResources.cs\n", c.Name)
+				class = GetCSResourcesClass(c)
+				err = writeCSClass(c.Namespace, c.Name+"Resources", []byte(class))
+				if err != nil {
+					fmt.Printf("Unable to write file: %s", err)
+				}
 			}
 
 		} else {
@@ -169,15 +175,16 @@ func generateCSCode(owner string, repo string, tag string, filename string, forc
 		}
 	}
 
-	for p, cl := range packageClassMap {
-		action := getAction(p, cl, tag)
-		fmt.Printf("  > Creating action: %s.cs\n", action.Name)
-		actionEnum := GetCSActionEnum(action)
-		err := writeCSClass(p, action.Name, []byte(actionEnum))
-		if err != nil {
-			fmt.Printf("Unable to write file: %s", err)
+	if !resource {
+		for p, cl := range packageClassMap {
+			action := getAction(p, cl, tag)
+			fmt.Printf("  > Creating action: %s.cs\n", action.Name)
+			actionEnum := GetCSActionEnum(action)
+			err := writeCSClass(p, action.Name, []byte(actionEnum))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
 		}
-
 	}
 
 	fmt.Println("Finish generating CSharp code!")

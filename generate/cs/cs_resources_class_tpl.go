@@ -6,7 +6,7 @@ using FINT.Model.Resource;
 
 namespace {{.Namespace}}
 {
-    public class {{.Name}}Resources extends AbstractCollectionResources<{{.Name}}Resource>
+    public class {{.Name}}Resources : AbstractCollectionResources<{{.Name}}Resource>
     {
     }
 }
