@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import javax.validation.constraints.NotNull;
 import lombok.ToString;
 
 import java.util.Collections;
@@ -61,7 +61,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     @Deprecated
     {{- end }}
     {{- if not $att.Optional }}
-    @NonNull
+    @NotNull
     {{- end }}
     private {{ javaType $att.Type | resource $.Resources | listFilt $att.List }} {{ $att.Name }};
     {{- end }}
