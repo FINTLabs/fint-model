@@ -1,0 +1,12 @@
+*.test
+.idea
+.DS_Store
+/java/
+/cs/
+*.xml
+fint-model
+build
+fint-model.exe
+*.orig
+.vscode/
+classes.txt
