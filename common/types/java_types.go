@@ -5,6 +5,8 @@ var JAVA_TYPE_MAP = map[string]string{
 	"boolean":     "Boolean",
 	"date":        "Date",
 	"dateTime":    "Date",
+	"float":       "Float",
+	"double":      "Double",
 	"long":        "Long",
 	"int":         "Integer",
 	"hovedklasse": "FintMainObject",
@@ -12,7 +14,6 @@ var JAVA_TYPE_MAP = map[string]string{
 	"abstrakt":    "FintAbstractObject",
 	"datatype":    "FintComplexDatatypeObject",
 }
-
 
 func GetJavaType(t string) string {
 
@@ -23,4 +24,3 @@ func GetJavaType(t string) string {
 		return t
 	}
 }
-
