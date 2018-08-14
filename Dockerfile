@@ -8,4 +8,5 @@ RUN /go/bin/fint-model --version
 FROM alpine
 COPY --from=builder /go/bin/fint-model /usr/bin/fint-model
 WORKDIR /src
+VOLUME [ "/src" ]
 ENTRYPOINT [ "/usr/bin/fint-model" ]

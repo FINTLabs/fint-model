@@ -7,10 +7,13 @@ package {{ resourcePkg .Package }};
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import java.util.Collection;
 import java.util.List;
 
+import lombok.NoArgsConstructor;
 import no.fint.model.resource.AbstractCollectionResources;
 
+@NoArgsConstructor
 public class {{ .Name }}Resources extends AbstractCollectionResources<{{.Name}}Resource> {
 
     public {{.Name}}Resources(Collection<{{.Name}}Resource> input) {
