@@ -4,21 +4,20 @@
 
 ## Description
 Generates `Java` and `C#` models from EA XMI export. This utility is mainly for internal FINT use, but if you 
-find it usefull, please use it!
+find it useful, please use it!
 
 ## Usage
 
 ```
 $ fint-model
 NAME:
-   fint-model - Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use,
-   but if you find it usefull, please use it!
+   fint-model - Generates Java and C# models from EA XMI export. This utility is mainly for internal FINT use, but if you find it usefull, please use it!
 
 USAGE:
    fint-model [global options] command [command options] [arguments...]
 
 VERSION:
-   1.0.0
+   0.0.0
 
 AUTHOR:
    FINTProsjektet
@@ -33,6 +32,9 @@ COMMANDS:
      help, h         Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
+   --owner value          Git repository containing model (default: "FINTprosjektet") [$GITHUB_OWNER]
+   --repo value           Git repository containing model (default: "fint-informasjonsmodell") [$GITHUB_PROJECT]
+   --filename value       File name containing information model (default: "FINT-informasjonsmodell.xml") [$MODEL_FILENAME]
    --tag value, -t value  the tag (version) of the model to generate (default: "latest")
    --force, -f            force downloading XMI for GitHub.
    --help, -h             show help
@@ -46,20 +48,21 @@ The downloaded XMI file is put in the `$HOME/.fint-model/.cache`. If you don't u
 
 ### Binaries
 
-Precompiled binaries can be downloaded [here](https://github.com/FINTprosjektet/fint-model/releases/latest)
+Precompiled binaries are available as [Docker images](https://dtr.fintlabs.no/)
 
-* Download for your os
-* Rename to fint-consumer
-* Copy to directory in your `PATH`
+Mount the directory where you want the generated source code to be written as `/src`.
 
-*Example macOS*
-```shell
-$ mv fint-consumer-darwin fint-consumer
-$ chmod +x fint-consumer
-$ sudo mv fint-consumer /usr/local/bin
+Linux / MacOS:
+```bash
+docker run -v $(pwd):/src dtr.fintlabs.no/jenkins/fint-model:latest <ARGS>
 ```
 
-### Go
+Windows PowerShell:
+```ps1
+docker run -v ${pwd}:/src dtr.fintlabs.no/jenkins/fint-model:latest <ARGS>
+```
+
+### Source
 
 To install, use `go get`:
 
