@@ -26,7 +26,11 @@ func CmdPrintClasses(c *cli.Context) {
 }
 
 func dumpClass(c *types.Class) {
-	fmt.Printf("Class: %s\n", c.Name)
+	dep := ""
+	if c.Deprecated {
+		dep = "<<DEPRECATED>>"
+	}
+	fmt.Printf("Class: %s %s\n", c.Name, dep)
 	fmt.Printf("  Abstract: %t\n", c.Abstract)
 	fmt.Printf("  Identifiable: %t\n", c.Identifiable)
 	fmt.Printf("  Resource: %t\n", c.Resource)
@@ -47,25 +51,28 @@ func dumpClass(c *types.Class) {
 	}
 
 	if len(c.Attributes) > 0 {
-		fmt.Println("  Attributes: ")
+		fmt.Println("  Attributes:")
 		for _, a := range c.Attributes {
+			dep := ""
+			if a.Deprecated {
+				dep = "<<DEPRECATED>>"
+			}
 			if a.List {
-				fmt.Printf("    - %s: List<%s>\n", a.Name, a.Type)
+				fmt.Printf("    - %s: List<%s> %s\n", a.Name, a.Type, dep)
 			} else {
-				fmt.Printf("    - %s: %s\n", a.Name, a.Type)
+				fmt.Printf("    - %s: %s %s\n", a.Name, a.Type, dep)
 			}
 		}
 	}
 
 	if len(c.Relations) > 0 {
-		fmt.Print("  Relations: ")
-		for i, r := range c.Relations {
-			fmt.Print(r)
-			if i == len(c.Relations)-1 {
-				fmt.Println()
-			} else {
-				fmt.Print(", ")
+		fmt.Println("  Relations:")
+		for _, r := range c.Relations {
+			s := ""
+			if r.Deprecated {
+				s = "<<DEPRECATED>>"
 			}
+			fmt.Printf("    - %s: %s[%s] %s\n", r.Name, r.Target, r.Multiplicity, s)
 		}
 	}
 

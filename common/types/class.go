@@ -3,6 +3,7 @@ package types
 type Class struct {
 	Name            string
 	Abstract        bool
+	Deprecated      bool
 	Extends         string
 	Package         string
 	Imports         []string
@@ -10,7 +11,7 @@ type Class struct {
 	Using           []string
 	Documentation   string
 	Attributes      []Attribute
-	Relations       []string
+	Relations       []Association
 	Resources       []Attribute
 	Resource        bool
 	ExtendsResource bool

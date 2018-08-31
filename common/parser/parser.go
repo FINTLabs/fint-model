@@ -38,6 +38,7 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 		class.Identifiable = identifiable(class.Attributes)
 		class.Stereotype = properties.SelectAttr("stereotype")
 		class.Documentation = properties.SelectAttr("documentation")
+		class.Deprecated = c.SelectElement("tags/tag[@name='DEPRECATED']") != nil
 		class.GitTag = tag
 
 		if len(class.Stereotype) == 0 {
@@ -276,6 +277,7 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 
 		attrib := types.Attribute{}
 		attrib.Name = replaceNO(a.SelectAttr("name"))
+		attrib.Deprecated = a.SelectElement("tags/tag[@name='DEPRECATED']") != nil
 		attrib.List = strings.Compare(a.SelectElement("bounds").SelectAttr("upper"), "*") == 0
 		attrib.Optional = !attrib.List && strings.Compare(a.SelectElement("bounds").SelectAttr("lower"), "0") == 0
 		attrib.Type = replaceNO(a.SelectElement("properties").SelectAttr("type"))
@@ -286,8 +288,8 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 	return attributes
 }
 
-func getRelations(doc *xmlquery.Node, c *xmlquery.Node) []string {
-	var assocs []string
+func getRelations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
+	var assocs []types.Association
 	isAbstract := toBool(c.SelectElement("properties").SelectAttr("isAbstract"))
 	if !isAbstract {
 		assocs = getAssociations(doc, c)
@@ -299,8 +301,8 @@ func getRelations(doc *xmlquery.Node, c *xmlquery.Node) []string {
 
 // TODO: This is actually iterative and not recursive, and works only for linear inheritance.
 // TODO: Possible to combine with getAssociationsFromExtends?
-func getRecursivelyAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) []string {
-	var assocs []string
+func getRecursivelyAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
+	var assocs []types.Association
 	extAssocs, extends := getAssociationsFromExtends(doc, c)
 	assocs = append(assocs, extAssocs...)
 	for {
@@ -313,8 +315,8 @@ func getRecursivelyAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node)
 	return assocs
 }
 
-func getAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) ([]string, *xmlquery.Node) {
-	var assocs []string
+func getAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) ([]types.Association, *xmlquery.Node) {
+	var assocs []types.Association
 	extends := xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source[@idref='%s']/../target", c.SelectAttr("idref")))
 	if len(extends) == 1 {
 		assocs = append(assocs, getAssociations(doc, extends[0])...)
@@ -324,16 +326,26 @@ func getAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) ([]string,
 	return assocs, nil
 }
 
-func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []string {
-	var assocs []string
+func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
+	var assocs []types.Association
 	for _, rr := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role", c.SelectAttr("idref"))) {
 		if len(rr.SelectAttr("name")) > 0 {
-			assocs = append(assocs, replaceNO(rr.SelectAttr("name")))
+			assoc := types.Association{}
+			assoc.Name = replaceNO(rr.SelectAttr("name"))
+			assoc.Target = replaceNO(rr.SelectElement("../model").SelectAttr("name"))
+			assoc.Multiplicity = rr.SelectElement("../type").SelectAttr("multiplicity")
+			assoc.Deprecated = rr.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
+			assocs = append(assocs, assoc)
 		}
 	}
 	for _, rl := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role", c.SelectAttr("idref"))) {
 		if len(rl.SelectAttr("name")) > 0 {
-			assocs = append(assocs, replaceNO(rl.SelectAttr("name")))
+			assoc := types.Association{}
+			assoc.Name = replaceNO(rl.SelectAttr("name"))
+			assoc.Target = replaceNO(rl.SelectElement("../model").SelectAttr("name"))
+			assoc.Multiplicity = rl.SelectElement("../type").SelectAttr("multiplicity")
+			assoc.Deprecated = rl.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
+			assocs = append(assocs, assoc)
 		}
 	}
 	return assocs

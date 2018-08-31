@@ -45,9 +45,9 @@ namespace {{ .Namespace }}
         {{- if .Relations }}
             {{ range $i, $rel := .Relations }}
 
-        public void Add{{ upperCaseFirst $rel }}(Link link)
+        public void Add{{ upperCaseFirst $rel.Name }}(Link link)
         {
-            AddLink("{{$rel}}", link);
+            AddLink("{{$rel.Name}}", link);
         }
             {{- end }}
         {{- end }}

@@ -36,6 +36,9 @@ import {{ resource $.Resources $i | extends $.ExtendsResource $.Extends }};
 @EqualsAndHashCode
 @ToString
 {{ end -}}
+{{ if .Deprecated -}}
+@Deprecated
+{{ end -}}
 public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} extends {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end -}} implements {{ javaType .Stereotype }}, FintLinks {
 
 {{- if .Attributes }}
@@ -54,6 +57,9 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     }
     {{- end }}
     {{- range $att := .Attributes }}
+    {{- if $att.Deprecated }}
+    @Deprecated
+    {{- end }}
     {{- if not $att.Optional }}
     @NonNull
     {{- end }}
@@ -69,12 +75,18 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     {{- if .Relations }}
         {{ range $i, $rel := .Relations }}
 
+    {{- if $rel.Deprecated }}
+    @Deprecated
+    {{- end }}
     @JsonIgnore
-    public List<Link> get{{ upperCaseFirst $rel }}() {
-        return getLinks().getOrDefault("{{$rel}}", Collections.emptyList()); 
+    public List<Link> get{{ upperCaseFirst $rel.Name }}() {
+        return getLinks().getOrDefault("{{$rel.Name}}", Collections.emptyList()); 
     }
-    public void add{{ upperCaseFirst $rel }}(Link link) {
-        addLink("{{$rel}}", link);
+    {{- if $rel.Deprecated }}
+    @Deprecated
+    {{- end }}
+    public void add{{ upperCaseFirst $rel.Name }}(Link link) {
+        addLink("{{$rel.Name}}", link);
     }
         {{- end }}
     {{- end }}

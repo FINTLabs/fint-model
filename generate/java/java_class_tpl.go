@@ -26,18 +26,24 @@ import {{ $i }};
 @EqualsAndHashCode
 @ToString
 {{ end -}}
+{{ if .Deprecated -}}
+@Deprecated
+{{ end -}}
 public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extends {{ .Extends }} {{ end -}} implements {{ javaType .Stereotype }} {
 
 {{- if .Relations }}
     {{ $c := sub (len .Relations) 1 -}}
     public enum Relasjonsnavn {
         {{- range $i, $rel := .Relations }}
-            {{ upperCase $rel }}{{ if ne $i $c }},{{ end -}}
+            {{ upperCase $rel.Name }}{{ if ne $i $c }},{{ end -}}
         {{ end }}
     }
 {{ end -}}
 {{ if .Attributes }}
     {{- range $att := .Attributes }}
+    {{- if $att.Deprecated }}
+    @Deprecated
+    {{- end }}
     {{- if not $att.Optional }}
     @NonNull
     {{- end }}
