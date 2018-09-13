@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 import no.fint.model.resource.AbstractCollectionResources;
 
 @NoArgsConstructor
+{{ if .Deprecated -}}
+@Deprecated
+{{ end -}}
 public class {{ .Name }}Resources extends AbstractCollectionResources<{{.Name}}Resource> {
 
     public {{.Name}}Resources(Collection<{{.Name}}Resource> input) {
