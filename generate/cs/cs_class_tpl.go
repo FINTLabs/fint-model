@@ -20,7 +20,7 @@ namespace {{ .Namespace }}
 		public enum Relasjonsnavn
         {
 		{{- range $i, $rel := .Relations }}
-			{{ $rel }}{{if ne $i $c }},{{ end -}}
+			{{ $rel.Name | upperCase }}{{if ne $i $c }},{{ end -}}
 		{{ end }}
         }
         {{ end }}

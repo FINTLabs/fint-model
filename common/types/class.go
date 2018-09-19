@@ -1,17 +1,21 @@
 package types
 
 type Class struct {
-	Name             string
-	Abstract         bool
-	Extends          string
-	Package          string
-	Imports          []string
-	Namespace        string
-	Using            []string
-	Documentation    string
-	Attributes       []Attribute
-	Relations        []string
-	Identifiable     bool
-	GitTag           string
-	Stereotype       string
+	Name            string
+	Abstract        bool
+	Deprecated      bool
+	Extends         string
+	Package         string
+	Imports         []string
+	Namespace       string
+	Using           []string
+	Documentation   string
+	Attributes      []Attribute
+	Relations       []Association
+	Resources       []Attribute
+	Resource        bool
+	ExtendsResource bool
+	Identifiable    bool
+	GitTag          string
+	Stereotype      string
 }

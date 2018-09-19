@@ -11,8 +11,6 @@ import (
 	"github.com/FINTprosjektet/fint-model/common/github"
 	"github.com/FINTprosjektet/fint-model/common/parser"
 	"github.com/FINTprosjektet/fint-model/common/types"
-	"github.com/FINTprosjektet/fint-model/namespaces"
-	"github.com/FINTprosjektet/fint-model/packages"
 	"github.com/codegangsta/cli"
 )
 
@@ -29,48 +27,84 @@ func CmdGenerate(c *cli.Context) {
 	repo := c.GlobalString("repo")
 	filename := c.GlobalString("filename")
 
+	resource := c.Bool("resource")
+
 	if c.String("lang") == "JAVA" {
-		generateJavaCode(owner, repo, tag, filename, force)
+		generateJavaCode(owner, repo, tag, filename, force, resource)
 	}
 
 	if c.String("lang") == "CS" {
-		generateCSCode(owner, repo, tag, filename, force)
+		generateCSCode(owner, repo, tag, filename, force, resource)
 	}
 
 	if c.String("lang") == "ALL" {
-		generateCSCode(owner, repo, tag, filename, force)
-		generateJavaCode(owner, repo, tag, filename, force)
+		generateCSCode(owner, repo, tag, filename, force, resource)
+		generateJavaCode(owner, repo, tag, filename, force, resource)
 	}
 }
 
-func generateJavaCode(owner string, repo string, tag string, filename string, force bool) {
+func writeFile(path string, filename string, content []byte) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = os.MkdirAll(path, 0777)
+		if err != nil {
+			return err
+		}
+	}
+	return ioutil.WriteFile(path+"/"+filename, content, 0777)
+}
+
+func writeJavaClass(pkg string, class string, content []byte) error {
+	path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
+	return writeFile(removeJavaPackagePathFromFilePath(path), class+".java", []byte(content))
+}
+
+func generateJavaCode(owner string, repo string, tag string, filename string, force bool, resource bool) {
 
 	document.Get(owner, repo, tag, filename, force)
 	fmt.Println("Generating Java code:")
 	setupJavaDirStructure(owner, repo, tag, filename, force)
 	classes, _, packageClassMap, _ := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
-		fmt.Printf("  > Creating class: %s.java\n", c.Name)
-		class := GetJavaClass(c)
+		if resource {
+			if c.Resource || len(c.Resources) > 0 || c.Identifiable {
+				fmt.Printf("  > Creating resource class: %sResource.java\n", c.Name)
+				class := GetJavaResourceClass(c)
+				pkg := strings.Replace(c.Package, "model", "model.resource", -1)
+				err := writeJavaClass(pkg, c.Name+"Resource", []byte(class))
+				if err != nil {
+					fmt.Printf("Unable to write file: %s", err)
+				}
 
-		path := fmt.Sprintf("%s/%s/%s.java", config.JAVA_BASE_PATH, strings.Replace(c.Package, ".", "/", -1), c.Name)
-		err := ioutil.WriteFile(removeJavaPackagePathFromFilePath(path), []byte(class), 0777)
-		if err != nil {
-			fmt.Printf("Unable to write file: %s", err)
+				fmt.Printf("  > Creating resources class: %sResources.java\n", c.Name)
+				class = GetJavaResourcesClass(c)
+				err = writeJavaClass(pkg, c.Name+"Resources", []byte(class))
+				if err != nil {
+					fmt.Printf("Unable to write file: %s", err)
+				}
+			}
+
+		} else {
+			fmt.Printf("  > Creating class: %s.java\n", c.Name)
+			class := GetJavaClass(c)
+			err := writeJavaClass(c.Package, c.Name, []byte(class))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
 		}
-
 	}
 
-	for p, cl := range packageClassMap {
-		action := getAction(p, cl, tag)
-		fmt.Printf("  > Creating action: %s.java\n", action.Name)
-		actionEnum := GetJavaActionEnum(action)
-		path := fmt.Sprintf("%s/%s/%s.java", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1), action.Name)
-		err := ioutil.WriteFile(removeJavaPackagePathFromFilePath(path), []byte(actionEnum), 0777)
-		if err != nil {
-			fmt.Printf("Unable to write file: %s", err)
-		}
+	if !resource {
+		for p, cl := range packageClassMap {
+			action := getAction(p, cl, tag)
+			fmt.Printf("  > Creating action: %s.java\n", action.Name)
+			actionEnum := GetJavaActionEnum(action)
+			path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1))
+			err := writeFile(removeJavaPackagePathFromFilePath(path), action.Name+".java", []byte(actionEnum))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
 
+		}
 	}
 
 	fmt.Println("Finish generating Java code!")
@@ -80,7 +114,7 @@ func removeJavaPackagePathFromFilePath(path string) string {
 	return strings.Replace(path, "no/fint/model/", "", -1)
 }
 
-func getAction(p string, cl []types.Class, tag string) types.Action {
+func getAction(p string, cl []*types.Class, tag string) types.Action {
 	var action types.Action
 
 	packageList := strings.Split(p, ".")
@@ -99,35 +133,58 @@ func getAction(p string, cl []types.Class, tag string) types.Action {
 	return action
 }
 
-func generateCSCode(owner string, repo string, tag string, filename string, force bool) {
+func writeCSClass(namespace string, class string, content []byte) error {
+	return writeFile(getCSPath(namespace), class+".cs", []byte(content))
+}
+
+func generateCSCode(owner string, repo string, tag string, filename string, force bool, resource bool) {
 
 	document.Get(owner, repo, tag, filename, force)
 	fmt.Println("Generating CSharp code:")
 	setupCSDirStructure(owner, repo, tag, filename, force)
 	classes, _, _, packageClassMap := parser.GetClasses(owner, repo, tag, filename, force)
 	for _, c := range classes {
-		fmt.Printf("  > Creating class: %s.cs\n", c.Name)
 
-		class := GetCSClass(c)
+		if resource {
+			if c.Resource || len(c.Resources) > 0 {
+				fmt.Printf("  > Creating resource class: %sResource.cs\n", c.Name)
+				class := GetCSResourceClass(c)
+				err := writeCSClass(c.Namespace, c.Name+"Resource", []byte(class))
+				if err != nil {
+					fmt.Printf("Unable to write file: %s", err)
+				}
 
-		path := fmt.Sprintf("%s/%s.cs", getCSPath(c.Namespace), c.Name)
-		err := ioutil.WriteFile(path, []byte(class), 0777)
-		if err != nil {
-			fmt.Printf("Unable to write file: %s", err)
+				fmt.Printf("  > Creating resources class: %sResources.cs\n", c.Name)
+				class = GetCSResourcesClass(c)
+				err = writeCSClass(c.Namespace, c.Name+"Resources", []byte(class))
+				if err != nil {
+					fmt.Printf("Unable to write file: %s", err)
+				}
+			}
+
+		} else {
+
+			fmt.Printf("  > Creating class: %s.cs\n", c.Name)
+
+			class := GetCSClass(c)
+
+			err := writeCSClass(c.Namespace, c.Name, []byte(class))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
 		}
-
 	}
 
-	for p, cl := range packageClassMap {
-		action := getAction(p, cl, tag)
-		fmt.Printf("  > Creating action: %s.cs\n", action.Name)
-		actionEnum := GetCSActionEnum(action)
-		path := fmt.Sprintf("%s/%s.cs", getCSPath(p), action.Name)
-		err := ioutil.WriteFile(path, []byte(actionEnum), 0777)
-		if err != nil {
-			fmt.Printf("Unable to write file: %s", err)
+	if !resource {
+		for p, cl := range packageClassMap {
+			action := getAction(p, cl, tag)
+			fmt.Printf("  > Creating action: %s.cs\n", action.Name)
+			actionEnum := GetCSActionEnum(action)
+			err := writeCSClass(p, action.Name, []byte(actionEnum))
+			if err != nil {
+				fmt.Printf("Unable to write file: %s", err)
+			}
 		}
-
 	}
 
 	fmt.Println("Finish generating CSharp code!")
@@ -136,20 +193,23 @@ func generateCSCode(owner string, repo string, tag string, filename string, forc
 
 func setupCSDirStructure(owner string, repo string, tag string, filename string, force bool) {
 	fmt.Println("  > Setup directory structure.")
-	os.RemoveAll("net")
+	os.RemoveAll("cs")
 	err := os.MkdirAll(config.CS_BASE_PATH, 0777)
 	if err != nil {
 		fmt.Println("Unable to create base structure")
 		fmt.Println(err)
 	}
-	for _, ns := range namespaces.DistinctNamespaceList(owner, repo, tag, filename, force) {
-		path := getCSPath(ns)
-		err := os.MkdirAll(path, 0777)
-		if err != nil {
-			fmt.Println("Unable to create namespace structure")
-			fmt.Println(err)
+
+	/*
+		for _, ns := range namespaces.DistinctNamespaceList(owner, repo, tag, filename, force) {
+			path := getCSPath(ns)
+			err := os.MkdirAll(path, 0777)
+			if err != nil {
+				fmt.Println("Unable to create namespace structure")
+				fmt.Println(err)
+			}
 		}
-	}
+	*/
 }
 func getCSPath(ns string) string {
 	nsList := strings.Split(ns, ".")
@@ -169,13 +229,14 @@ func setupJavaDirStructure(owner string, repo string, tag string, filename strin
 		fmt.Println(err)
 	}
 
-	for _, pkg := range packages.DistinctPackageList(owner, repo, tag, filename, force) {
-		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
-		err := os.MkdirAll(removeJavaPackagePathFromFilePath(path), 0777)
-		if err != nil {
-			fmt.Println("Unable to create packages structure")
-			fmt.Println(err)
+	/*
+		for _, pkg := range packages.DistinctPackageList(owner, repo, tag, filename, force) {
+			path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(pkg, ".", "/", -1))
+			err := os.MkdirAll(removeJavaPackagePathFromFilePath(path), 0777)
+			if err != nil {
+				fmt.Println("Unable to create packages structure")
+				fmt.Println(err)
+			}
 		}
-	}
-
+	*/
 }
