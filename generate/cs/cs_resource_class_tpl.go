@@ -26,7 +26,7 @@ namespace {{ .Namespace }}
     {{ end }}
 
     {{- if not .ExtendsResource }}
-        public {{.Name}}Resource()
+        {{if .Abstract}}protected{{else}}public{{end}} {{.Name}}Resource()
         {
             Links = new Dictionary<string, List<Link>>();
         }
