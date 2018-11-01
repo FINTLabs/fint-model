@@ -16,15 +16,16 @@ using {{ $u }};
 namespace {{ .Namespace }}
 {
 
-	public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} : {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end }}
-	{
+    public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} : {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end }}
+    {
 
-        {{ if .Attributes }}
-		{{ range $att := .Attributes -}}
-		public {{ csType $att.Type $att.Optional | resource $.Resources | listFilt $att.List }} {{ upperCaseFirst $att.Name }} { get; set; }
-		{{ end -}}
-    	{{ end }}
-        
+    {{ if .Attributes }}
+        {{ range $att := .Attributes -}}
+        public {{ csType $att.Type $att.Optional | resource $.Resources | listFilt $att.List }} {{ upperCaseFirst $att.Name }} { get; set; }
+        {{ end -}}
+    {{ end }}
+
+    {{- if not .ExtendsResource }}
         public {{.Name}}Resource()
         {
             Links = new Dictionary<string, List<Link>>();
@@ -32,8 +33,8 @@ namespace {{ .Namespace }}
 
         [JsonProperty(PropertyName = "_links")]
         public {{- if .Extends }} new {{- end }} Dictionary<string, List<Link>> Links { get; private set; }
-        
-        private void AddLink(string key, Link link)
+
+        protected void AddLink(string key, Link link)
         {
             if (!Links.ContainsKey(key))
             {
@@ -41,7 +42,8 @@ namespace {{ .Namespace }}
             }
             Links[key].Add(link);
         }
-        
+     {{ end -}}
+
         {{- if .Relations }}
             {{ range $i, $rel := .Relations }}
 
