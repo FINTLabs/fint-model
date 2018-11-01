@@ -32,7 +32,7 @@ namespace {{ .Namespace }}
         }
 
         [JsonProperty(PropertyName = "_links")]
-        public {{- if .Extends }} new {{- end }} Dictionary<string, List<Link>> Links { get; private set; }
+        public Dictionary<string, List<Link>> Links { get; private set; }
 
         protected void AddLink(string key, Link link)
         {
