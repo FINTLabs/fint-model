@@ -8,7 +8,10 @@ pipeline {
                 not { buildingTag() }
             }
             steps {
-                sh "docker build --build-arg VERSION=${BUILD_TAG} ."
+                sh "docker build --tag dtr.fintlabs.no/jenkins/fint-model:latest --build-arg VERSION=${BUILD_TAG} ."
+                withDockerRegistry([credentialsId: 'dtr-fintlabs-no', url: 'https://dtr.fintlabs.no']) {
+                    sh "docker push dtr.fintlabs.no/jenkins/fint-model:latest"
+                }
             }
         }
         stage('Deploy') {
