@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/FINTprosjektet/fint-model/common/utils"
+	"github.com/FINTLabs/fint-model/common/utils"
 	"github.com/google/go-github/github"
 	"github.com/mitchellh/go-homedir"
 	"golang.org/x/net/context"

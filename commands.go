@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/FINTprosjektet/fint-model/branches"
-	"github.com/FINTprosjektet/fint-model/classes"
-	"github.com/FINTprosjektet/fint-model/generate"
-	"github.com/FINTprosjektet/fint-model/namespaces"
-	"github.com/FINTprosjektet/fint-model/packages"
-	"github.com/FINTprosjektet/fint-model/tags"
+	"github.com/FINTLabs/fint-model/branches"
+	"github.com/FINTLabs/fint-model/classes"
+	"github.com/FINTLabs/fint-model/generate"
+	"github.com/FINTLabs/fint-model/namespaces"
+	"github.com/FINTLabs/fint-model/packages"
+	"github.com/FINTLabs/fint-model/tags"
 	"github.com/codegangsta/cli"
 )
 
@@ -17,7 +17,7 @@ var GlobalFlags = []cli.Flag{
 	cli.StringFlag{
 		EnvVar: "GITHUB_OWNER",
 		Name:   "owner",
-		Value:  "FINTprosjektet",
+		Value:  "FINTLabs",
 		Usage:  "Git repository containing model",
 	},
 	cli.StringFlag{

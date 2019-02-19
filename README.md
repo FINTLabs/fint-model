@@ -20,7 +20,7 @@ VERSION:
    0.0.0
 
 AUTHOR:
-   FINTProsjektet
+   FINTLabs
 
 COMMANDS:
      printClasses    list classes
@@ -32,7 +32,7 @@ COMMANDS:
      help, h         Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --owner value          Git repository containing model (default: "FINTprosjektet") [$GITHUB_OWNER]
+   --owner value          Git repository containing model (default: "FINTLabs") [$GITHUB_OWNER]
    --repo value           Git repository containing model (default: "fint-informasjonsmodell") [$GITHUB_PROJECT]
    --filename value       File name containing information model (default: "FINT-informasjonsmodell.xml") [$MODEL_FILENAME]
    --tag value, -t value  the tag (version) of the model to generate (default: "latest")
@@ -67,10 +67,10 @@ docker run -v ${pwd}:/src dtr.fintlabs.no/jenkins/fint-model:latest <ARGS>
 To install, use `go get`:
 
 ```bash
-go get -d github.com/FINTprosjektet/fint-model
-go install github.com/FINTprosjektet/fint-model
+go get -d github.com/FINTLabs/fint-model
+go install github.com/FINTLabs/fint-model
 ```
 
 ## Author
 
-[FINTProsjektet](https://fintprosjektet.github.io)
+[FINTLabs](https://FINTLabs.github.io)

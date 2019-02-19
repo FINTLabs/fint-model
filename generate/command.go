@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/FINTprosjektet/fint-model/common/config"
-	"github.com/FINTprosjektet/fint-model/common/document"
-	"github.com/FINTprosjektet/fint-model/common/github"
-	"github.com/FINTprosjektet/fint-model/common/parser"
-	"github.com/FINTprosjektet/fint-model/common/types"
+	"github.com/FINTLabs/fint-model/common/config"
+	"github.com/FINTLabs/fint-model/common/document"
+	"github.com/FINTLabs/fint-model/common/github"
+	"github.com/FINTLabs/fint-model/common/parser"
+	"github.com/FINTLabs/fint-model/common/types"
 	"github.com/codegangsta/cli"
 )
 

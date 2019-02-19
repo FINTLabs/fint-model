@@ -6,9 +6,9 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/FINTprosjektet/fint-model/common/types"
-	"github.com/FINTprosjektet/fint-model/generate/cs"
-	"github.com/FINTprosjektet/fint-model/generate/java"
+	"github.com/FINTLabs/fint-model/common/types"
+	"github.com/FINTLabs/fint-model/generate/cs"
+	"github.com/FINTLabs/fint-model/generate/java"
 )
 
 var funcMap = template.FuncMap{

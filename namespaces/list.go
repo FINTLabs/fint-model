@@ -1,8 +1,8 @@
 package namespaces
 
 import (
-	"github.com/FINTprosjektet/fint-model/common/parser"
-	"github.com/FINTprosjektet/fint-model/common/utils"
+	"github.com/FINTLabs/fint-model/common/parser"
+	"github.com/FINTLabs/fint-model/common/utils"
 )
 
 func DistinctNamespaceList(owner string, repo string, tag string, filename string, force bool) []string {

@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/FINTprosjektet/fint-model/common/config"
-	"github.com/FINTprosjektet/fint-model/common/document"
-	"github.com/FINTprosjektet/fint-model/common/types"
-	"github.com/FINTprosjektet/fint-model/common/utils"
+	"github.com/FINTLabs/fint-model/common/config"
+	"github.com/FINTLabs/fint-model/common/document"
+	"github.com/FINTLabs/fint-model/common/types"
+	"github.com/FINTLabs/fint-model/common/utils"
 	"github.com/antchfx/xquery/xml"
 )
 

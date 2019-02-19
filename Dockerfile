@@ -1,6 +1,6 @@
 FROM golang AS builder
 ENV CGO_ENABLED=0
-WORKDIR /go/src/app/vendor/github.com/FINTprosjektet/fint-model
+WORKDIR /go/src/app/vendor/github.com/FINTLabs/fint-model
 ARG VERSION=0.0.0
 COPY . .
 RUN go install -v -ldflags "-X main.Version=${VERSION}"

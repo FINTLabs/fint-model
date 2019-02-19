@@ -3,7 +3,7 @@ package namespaces
 import (
 	"fmt"
 
-	"github.com/FINTprosjektet/fint-model/common/github"
+	"github.com/FINTLabs/fint-model/common/github"
 	"github.com/codegangsta/cli"
 )
 

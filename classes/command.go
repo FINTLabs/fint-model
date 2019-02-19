@@ -3,9 +3,9 @@ package classes
 import (
 	"fmt"
 
-	"github.com/FINTprosjektet/fint-model/common/github"
-	"github.com/FINTprosjektet/fint-model/common/parser"
-	"github.com/FINTprosjektet/fint-model/common/types"
+	"github.com/FINTLabs/fint-model/common/github"
+	"github.com/FINTLabs/fint-model/common/parser"
+	"github.com/FINTLabs/fint-model/common/types"
 	"github.com/codegangsta/cli"
 )
 
