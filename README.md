@@ -1,7 +1,5 @@
 # fint-model
 
-
-
 ## Description
 Generates `Java` and `C#` models from EA XMI export. This utility is mainly for internal FINT use, but if you 
 find it useful, please use it!
@@ -48,18 +46,18 @@ The downloaded XMI file is put in the `$HOME/.fint-model/.cache`. If you don't u
 
 ### Binaries
 
-Precompiled binaries are available as [Docker images](https://dtr.fintlabs.no/)
+Precompiled binaries are available as [Docker images](https://cloud.docker.com/u/fint/repository/docker/fint/fint-model)
 
 Mount the directory where you want the generated source code to be written as `/src`.
 
 Linux / MacOS:
 ```bash
-docker run -v $(pwd):/src dtr.fintlabs.no/jenkins/fint-model:latest <ARGS>
+docker run -v $(pwd):/src fint/fint-model:latest <ARGS>
 ```
 
 Windows PowerShell:
 ```ps1
-docker run -v ${pwd}:/src dtr.fintlabs.no/jenkins/fint-model:latest <ARGS>
+docker run -v ${pwd}:/src fint/fint-model:latest <ARGS>
 ```
 
 ### Source
