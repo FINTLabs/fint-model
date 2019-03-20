@@ -8,10 +8,8 @@ pipeline {
                 not { buildingTag() }
             }
             steps {
-                sh "docker build --tag fint/fint-model:latest --build-arg VERSION=${BUILD_TAG} ."
-                withDockerRegistry([credentialsId: 'asgeir-docker', url: '']) {
-                    sh "docker push fint/fint-model:latest"
-                }
+                sh "docker build --tag fint-model --build-arg VERSION=${BUILD_TAG} ."
+                sh "docker run -i fint-model generate"
             }
         }
         stage('Deploy') {
@@ -26,6 +24,8 @@ pipeline {
                 sh "docker build --tag fint/fint-model:${VERSION} --build-arg VERSION=${VERSION} ."
                 withDockerRegistry([credentialsId: 'asgeir-docker', url: '']) {
                     sh "docker push fint/fint-model:${VERSION}"
+                    sh "docker tag fint/fint-model:${VERSION} fint/fint-model:latest"
+                    sh "docker push fint/fint-model:latest"
                 }
             }
         }

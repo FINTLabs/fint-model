@@ -82,29 +82,26 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 					fmt.Printf("Unable to write file: %s", err)
 				}
 			}
+		}
 
-		} else {
-			fmt.Printf("  > Creating class: %s.java\n", c.Name)
-			class := GetJavaClass(c)
-			err := writeJavaClass(c.Package, c.Name, []byte(class))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
-			}
+		fmt.Printf("  > Creating class: %s.java\n", c.Name)
+		class := GetJavaClass(c)
+		err := writeJavaClass(c.Package, c.Name, []byte(class))
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
 		}
 	}
 
-	if !resource {
-		for p, cl := range packageClassMap {
-			action := getAction(p, cl, tag)
-			fmt.Printf("  > Creating action: %s.java\n", action.Name)
-			actionEnum := GetJavaActionEnum(action)
-			path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1))
-			err := writeFile(removeJavaPackagePathFromFilePath(path), action.Name+".java", []byte(actionEnum))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
-			}
-
+	for p, cl := range packageClassMap {
+		action := getAction(p, cl, tag)
+		fmt.Printf("  > Creating action: %s.java\n", action.Name)
+		actionEnum := GetJavaActionEnum(action)
+		path := fmt.Sprintf("%s/%s", config.JAVA_BASE_PATH, strings.Replace(p, ".", "/", -1))
+		err := writeFile(removeJavaPackagePathFromFilePath(path), action.Name+".java", []byte(actionEnum))
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
 		}
+
 	}
 
 	fmt.Println("Finish generating Java code!")
