@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import no.fint.model.{{ javaType .Stereotype }};
 {{- if .Imports -}}
@@ -47,6 +48,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     {{- if not $att.Optional }}
     {{ if $att.List }}@NotEmpty{{ else if eq "string" $att.Type }}@NotBlank{{ else }}@NotNull{{ end }}
     {{- end }}
+    @Valid
     private {{ javaType $att.Type | listFilt $att.List }} {{ $att.Name }};
     {{- end }}
 {{- end }}
