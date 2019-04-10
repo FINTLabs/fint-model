@@ -48,8 +48,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     {{- if not $att.Optional }}
     {{ if $att.List }}@NotEmpty{{ else if eq "string" $att.Type }}@NotBlank{{ else }}@NotNull{{ end }}
     {{- end }}
-    @Valid
-    private {{ javaType $att.Type | listFilt $att.List }} {{ $att.Name }};
+    private {{ javaType $att.Type | validFilt $att.Type | listFilt $att.List }} {{ $att.Name }};
     {{- end }}
 {{- end }}
 }

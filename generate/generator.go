@@ -38,6 +38,13 @@ var funcMap = template.FuncMap{
 		return s
 	},
 	"javaType": types.GetJavaType,
+	"validFilt": func(t string, s string) string {
+		_, ok := types.JAVA_TYPE_MAP[t]
+		if ok {
+			return s
+		}
+		return `@Valid ` + s
+	},
 	"csType": func(s string, opt bool) string {
 		typ := types.GetCSType(s)
 		if opt && types.IsValueType(typ) {

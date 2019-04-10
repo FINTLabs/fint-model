@@ -64,8 +64,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     {{- if not $att.Optional }}
     {{ if $att.List }}@NotEmpty{{ else if eq "string" $att.Type }}@NotBlank{{ else }}@NotNull{{ end }}
     {{- end }}
-    @Valid
-    private {{ javaType $att.Type | resource $.Resources | listFilt $att.List }} {{ $att.Name }};
+    private {{ javaType $att.Type | resource $.Resources | validFilt $att.Type | listFilt $att.List }} {{ $att.Name }};
     {{- end }}
 
 {{- end }}
