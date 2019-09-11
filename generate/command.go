@@ -159,28 +159,25 @@ func generateCSCode(owner string, repo string, tag string, filename string, forc
 				}
 			}
 
-		} else {
+		}
 
-			fmt.Printf("  > Creating class: %s.cs\n", c.Name)
+		fmt.Printf("  > Creating class: %s.cs\n", c.Name)
 
-			class := GetCSClass(c)
+		class := GetCSClass(c)
 
-			err := writeCSClass(c.Namespace, c.Name, []byte(class))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
-			}
+		err := writeCSClass(c.Namespace, c.Name, []byte(class))
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
 		}
 	}
 
-	if !resource {
-		for p, cl := range packageClassMap {
-			action := getAction(p, cl, tag)
-			fmt.Printf("  > Creating action: %s.cs\n", action.Name)
-			actionEnum := GetCSActionEnum(action)
-			err := writeCSClass(p, action.Name, []byte(actionEnum))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
-			}
+	for p, cl := range packageClassMap {
+		action := getAction(p, cl, tag)
+		fmt.Printf("  > Creating action: %s.cs\n", action.Name)
+		actionEnum := GetCSActionEnum(action)
+		err := writeCSClass(p, action.Name, []byte(actionEnum))
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
 		}
 	}
 
