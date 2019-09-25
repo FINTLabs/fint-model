@@ -10,12 +10,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.ToString;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 import no.fint.model.{{ javaType .Stereotype }};
 import no.fint.model.resource.FintLinks;
@@ -61,9 +62,9 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     @Deprecated
     {{- end }}
     {{- if not $att.Optional }}
-    @NonNull
+    {{ if $att.List }}@NotEmpty{{ else if eq "string" $att.Type }}@NotBlank{{ else }}@NotNull{{ end }}
     {{- end }}
-    private {{ javaType $att.Type | resource $.Resources | listFilt $att.List }} {{ $att.Name }};
+    private {{ javaType $att.Type | resource $.Resources | validFilt $att.Type | listFilt $att.List }} {{ $att.Name }};
     {{- end }}
 
 {{- end }}

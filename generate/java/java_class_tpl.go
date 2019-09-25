@@ -8,8 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.NonNull;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 import no.fint.model.{{ javaType .Stereotype }};
 {{- if .Imports -}}
 {{ range $i := .Imports }}
@@ -45,9 +46,9 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     @Deprecated
     {{- end }}
     {{- if not $att.Optional }}
-    @NonNull
+    {{ if $att.List }}@NotEmpty{{ else if eq "string" $att.Type }}@NotBlank{{ else }}@NotNull{{ end }}
     {{- end }}
-    private {{ javaType $att.Type | listFilt $att.List }} {{ $att.Name }};
+    private {{ javaType $att.Type | validFilt $att.Type | listFilt $att.List }} {{ $att.Name }};
     {{- end }}
 {{- end }}
 }

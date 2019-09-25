@@ -279,7 +279,7 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 		attrib.Name = replaceNO(a.SelectAttr("name"))
 		attrib.Deprecated = a.SelectElement("tags/tag[@name='DEPRECATED']") != nil
 		attrib.List = strings.Compare(a.SelectElement("bounds").SelectAttr("upper"), "*") == 0
-		attrib.Optional = !attrib.List && strings.Compare(a.SelectElement("bounds").SelectAttr("lower"), "0") == 0
+		attrib.Optional = strings.Compare(a.SelectElement("bounds").SelectAttr("lower"), "0") == 0
 		attrib.Type = replaceNO(a.SelectElement("properties").SelectAttr("type"))
 
 		attributes = append(attributes, attrib)
