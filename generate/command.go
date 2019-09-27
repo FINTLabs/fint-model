@@ -69,7 +69,7 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 			if c.Resource || len(c.Resources) > 0 || c.Identifiable {
 				fmt.Printf("  > Creating resource class: %sResource.java\n", c.Name)
 				class := GetJavaResourceClass(c)
-				pkg := strings.Replace(c.Package, "model", "model.resource", -1)
+				pkg := strings.Replace(c.Package, ".model.", ".model.resource.", -1)
 				err := writeJavaClass(pkg, c.Name+"Resource", []byte(class))
 				if err != nil {
 					fmt.Printf("Unable to write file: %s", err)

@@ -15,19 +15,19 @@ var funcMap = template.FuncMap{
 	//"add": func(i int, ii int) int { return i + ii },
 	"sub": func(i int, ii int) int { return i - ii },
 	"resourcePkg": func(s string) string {
-		return strings.Replace(s, "model", "model.resource", -1)
+		return strings.Replace(s, ".model.", ".model.resource.", -1)
 	},
 	"resource": func(resources []types.Attribute, s string) string {
 		for _, a := range resources {
 			if strings.HasSuffix(s, a.Type) {
-				return strings.Replace(s, "model", "model.resource", -1) + "Resource"
+				return strings.Replace(s, ".model.", ".model.resource.", -1) + "Resource"
 			}
 		}
 		return s
 	},
 	"extends": func(isResource bool, extends string, s string) string {
 		if isResource && strings.HasSuffix(s, extends) {
-			return strings.Replace(s, "model", "model.resource", -1) + "Resource"
+			return strings.Replace(s, ".model.", ".model.resource.", -1) + "Resource"
 		}
 		return s
 	},
