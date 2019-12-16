@@ -11,7 +11,7 @@ import (
 	"github.com/FINTLabs/fint-model/common/github"
 	"github.com/FINTLabs/fint-model/common/parser"
 	"github.com/FINTLabs/fint-model/common/types"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func CmdGenerate(c *cli.Context) {
