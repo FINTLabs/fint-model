@@ -130,8 +130,8 @@ func getAction(p string, cl []*types.Class, tag string) types.Action {
 	return action
 }
 
-func writeCSClass(namespace string, class string, content []byte) error {
-	return writeFile(getCSPath(namespace), class+".cs", []byte(content))
+func writeCSClass(namespace string, class string, content []byte, resource bool) error {
+	return writeFile(getCSPath(namespace, resource), class+".cs", []byte(content))
 }
 
 func generateCSCode(owner string, repo string, tag string, filename string, force bool, resource bool) {
@@ -146,41 +146,37 @@ func generateCSCode(owner string, repo string, tag string, filename string, forc
 			if c.Resource || len(c.Resources) > 0 {
 				fmt.Printf("  > Creating resource class: %sResource.cs\n", c.Name)
 				class := GetCSResourceClass(c)
-				err := writeCSClass(c.Namespace, c.Name+"Resource", []byte(class))
+				err := writeCSClass(c.Namespace, c.Name+"Resource", []byte(class), true)
 				if err != nil {
 					fmt.Printf("Unable to write file: %s", err)
 				}
 
 				fmt.Printf("  > Creating resources class: %sResources.cs\n", c.Name)
 				class = GetCSResourcesClass(c)
-				err = writeCSClass(c.Namespace, c.Name+"Resources", []byte(class))
+				err = writeCSClass(c.Namespace, c.Name+"Resources", []byte(class), true)
 				if err != nil {
 					fmt.Printf("Unable to write file: %s", err)
 				}
 			}
+		}
 
-		} else {
+		fmt.Printf("  > Creating class: %s.cs\n", c.Name)
 
-			fmt.Printf("  > Creating class: %s.cs\n", c.Name)
+		class := GetCSClass(c)
 
-			class := GetCSClass(c)
-
-			err := writeCSClass(c.Namespace, c.Name, []byte(class))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
-			}
+		err := writeCSClass(c.Namespace, c.Name, []byte(class), false)
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
 		}
 	}
 
-	if !resource {
-		for p, cl := range packageClassMap {
-			action := getAction(p, cl, tag)
-			fmt.Printf("  > Creating action: %s.cs\n", action.Name)
-			actionEnum := GetCSActionEnum(action)
-			err := writeCSClass(p, action.Name, []byte(actionEnum))
-			if err != nil {
-				fmt.Printf("Unable to write file: %s", err)
-			}
+	for p, cl := range packageClassMap {
+		action := getAction(p, cl, tag)
+		fmt.Printf("  > Creating action: %s.cs\n", action.Name)
+		actionEnum := GetCSActionEnum(action)
+		err := writeCSClass(p, action.Name, []byte(actionEnum), false)
+		if err != nil {
+			fmt.Printf("Unable to write file: %s", err)
 		}
 	}
 
@@ -190,7 +186,7 @@ func generateCSCode(owner string, repo string, tag string, filename string, forc
 
 func setupCSDirStructure(owner string, repo string, tag string, filename string, force bool) {
 	fmt.Println("  > Setup directory structure.")
-	os.RemoveAll("cs")
+	os.RemoveAll(config.CS_BASE_PATH)
 	err := os.MkdirAll(config.CS_BASE_PATH, 0777)
 	if err != nil {
 		fmt.Println("Unable to create base structure")
@@ -208,18 +204,26 @@ func setupCSDirStructure(owner string, repo string, tag string, filename string,
 		}
 	*/
 }
-func getCSPath(ns string) string {
+func getCSPath(ns string, resource bool) string {
+	base := getCSBase(resource)
 	nsList := strings.Split(ns, ".")
 	projectDir := fmt.Sprintf("%s.%s.%s", nsList[0], nsList[1], nsList[2])
 	subDirs := strings.Replace(ns, projectDir, "", -1)
 	subDirs = strings.Replace(subDirs, ".", "/", -1)
-	path := fmt.Sprintf("%s/%s/%s", config.CS_BASE_PATH, projectDir, subDirs)
+	path := fmt.Sprintf("%s/%s/%s", base, projectDir, subDirs)
 	return path
+}
+
+func getCSBase(resource bool) string {
+	if resource {
+		return config.CS_BASE_PATH + "/resource"
+	}
+	return config.CS_BASE_PATH
 }
 
 func setupJavaDirStructure(owner string, repo string, tag string, filename string, force bool) {
 	fmt.Println("  > Setup directory structure.")
-	os.RemoveAll("java")
+	os.RemoveAll(config.JAVA_BASE_PATH)
 	err := os.MkdirAll(config.JAVA_BASE_PATH, 0777)
 	if err != nil {
 		fmt.Println("Unable to create base structure")
