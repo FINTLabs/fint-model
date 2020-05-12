@@ -211,7 +211,6 @@ func getCSPath(ns string, resource bool) string {
 	subDirs := strings.Replace(ns, projectDir, "", -1)
 	subDirs = strings.Replace(subDirs, ".", "/", -1)
 	path := fmt.Sprintf("%s/%s/%s", base, projectDir, subDirs)
-	fmt.Println(path)
 	return path
 }
 
