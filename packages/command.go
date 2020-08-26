@@ -5,7 +5,7 @@ import (
 
 	"github.com/FINTLabs/fint-model/common/config"
 	"github.com/FINTLabs/fint-model/common/github"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 func CmdListPackages(c *cli.Context) {

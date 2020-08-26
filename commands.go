@@ -10,7 +10,7 @@ import (
 	"github.com/FINTLabs/fint-model/namespaces"
 	"github.com/FINTLabs/fint-model/packages"
 	"github.com/FINTLabs/fint-model/tags"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 var GlobalFlags = []cli.Flag{
