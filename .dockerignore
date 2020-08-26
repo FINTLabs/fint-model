@@ -10,3 +10,4 @@ fint-model.exe
 *.orig
 .vscode/
 classes.txt
+/.git/
