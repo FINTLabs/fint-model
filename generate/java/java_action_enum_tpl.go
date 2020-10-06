@@ -1,7 +1,6 @@
 package java
 
-const ACTION_ENUM_TEMPLATE = 
-`package {{ .Package }};
+const ACTION_ENUM_TEMPLATE = `package {{ .Package }};
 
 import java.util.Arrays;
 import java.util.List;

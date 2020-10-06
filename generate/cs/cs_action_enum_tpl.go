@@ -1,7 +1,6 @@
 package cs
 
-const ACTION_ENUM_TEMPLATE = 
-`using System;
+const ACTION_ENUM_TEMPLATE = `using System;
 
 namespace {{ .Namespace }}
 {

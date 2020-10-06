@@ -1,7 +1,6 @@
 package java
 
-const RESOURCE_CLASS_TEMPLATE = 
-`package {{ resourcePkg .Package }};
+const RESOURCE_CLASS_TEMPLATE = `package {{ resourcePkg .Package }};
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
