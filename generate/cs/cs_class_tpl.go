@@ -1,8 +1,6 @@
 package cs
 
-const CLASS_TEMPLATE = `// Built from tag {{ .GitTag }}
-
-using System;
+const CLASS_TEMPLATE = `using System;
 using System.Collections.Generic;
 
 {{ if .Using }}
