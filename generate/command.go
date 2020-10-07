@@ -143,7 +143,7 @@ func generateCSCode(owner string, repo string, tag string, filename string, forc
 	for _, c := range classes {
 
 		if resource {
-			if c.Resource || len(c.Resources) > 0 {
+			if c.Resource || len(c.Resources) > 0 || c.Identifiable {
 				fmt.Printf("  > Creating resource class: %sResource.cs\n", c.Name)
 				class := GetCSResourceClass(c)
 				err := writeCSClass(c.Namespace, c.Name+"Resource", []byte(class), true)
