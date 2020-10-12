@@ -1,8 +1,6 @@
 package cs
 
-const ACTION_ENUM_TEMPLATE = `// Built from tag {{ .GitTag }}
-
-using System;
+const ACTION_ENUM_TEMPLATE = `using System;
 
 namespace {{ .Namespace }}
 {

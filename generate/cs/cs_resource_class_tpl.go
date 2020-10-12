@@ -1,8 +1,6 @@
 package cs
 
-const RESOURCE_CLASS_TEMPLATE = `// Built from tag {{ .GitTag }}
-
-using System;
+const RESOURCE_CLASS_TEMPLATE = `using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using FINT.Model.Resource;
