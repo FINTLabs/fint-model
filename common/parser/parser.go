@@ -32,7 +32,7 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 		class.Abstract = toBool(properties.SelectAttr("isAbstract"))
 		class.Extends = getExtends(doc, c)
 		class.Attributes = getAttributes(c)
-		class.Relations = getRelations(doc, c)
+		class.Relations = getAssociations(doc, c)
 		class.Package = getPackagePath(c, doc)
 		class.Namespace = getNamespacePath(c, doc)
 		class.Identifiable = identifiable(class.Attributes)
@@ -288,64 +288,24 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 	return attributes
 }
 
-func getRelations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
-	var assocs []types.Association
-	isAbstract := toBool(c.SelectElement("properties").SelectAttr("isAbstract"))
-	if !isAbstract {
-		assocs = getAssociations(doc, c)
-		assocs = append(assocs, getRecursivelyAssociationsFromExtends(doc, c)...)
-	}
-
-	return assocs
-}
-
-// TODO: This is actually iterative and not recursive, and works only for linear inheritance.
-// TODO: Possible to combine with getAssociationsFromExtends?
-func getRecursivelyAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
-	var assocs []types.Association
-	extAssocs, extends := getAssociationsFromExtends(doc, c)
-	assocs = append(assocs, extAssocs...)
-	for {
-		if extends == nil {
-			break
-		}
-		extAssocs, extends = getAssociationsFromExtends(doc, extends)
-		assocs = append(assocs, extAssocs...)
-	}
-	return assocs
-}
-
-func getAssociationsFromExtends(doc *xmlquery.Node, c *xmlquery.Node) ([]types.Association, *xmlquery.Node) {
-	var assocs []types.Association
-	extends := xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source[@idref='%s']/../target", c.SelectAttr("idref")))
-	if len(extends) == 1 {
-		assocs = append(assocs, getAssociations(doc, extends[0])...)
-		return assocs, extends[0]
-	}
-
-	return assocs, nil
-}
-
 func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 	var assocs []types.Association
-	for _, rr := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role", c.SelectAttr("idref"))) {
-		if len(rr.SelectAttr("name")) > 0 {
-			assoc := types.Association{}
-			assoc.Name = replaceNO(rr.SelectAttr("name"))
-			assoc.Target = replaceNO(rr.SelectElement("../model").SelectAttr("name"))
-			assoc.Multiplicity = rr.SelectElement("../type").SelectAttr("multiplicity")
-			assoc.Deprecated = rr.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
-			assocs = append(assocs, assoc)
-		}
+
+	queries := [...]string{
+		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role", c.SelectAttr("idref")),
+		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role", c.SelectAttr("idref")),
 	}
-	for _, rl := range xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role", c.SelectAttr("idref"))) {
-		if len(rl.SelectAttr("name")) > 0 {
-			assoc := types.Association{}
-			assoc.Name = replaceNO(rl.SelectAttr("name"))
-			assoc.Target = replaceNO(rl.SelectElement("../model").SelectAttr("name"))
-			assoc.Multiplicity = rl.SelectElement("../type").SelectAttr("multiplicity")
-			assoc.Deprecated = rl.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
-			assocs = append(assocs, assoc)
+
+	for _, query := range queries {
+		for _, r := range xmlquery.Find(doc, query) {
+			if len(r.SelectAttr("name")) > 0 {
+				assoc := types.Association{}
+				assoc.Name = replaceNO(r.SelectAttr("name"))
+				assoc.Target = replaceNO(r.SelectElement("../model").SelectAttr("name"))
+				assoc.Multiplicity = r.SelectElement("../type").SelectAttr("multiplicity")
+				assoc.Deprecated = r.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
+				assocs = append(assocs, assoc)
+			}
 		}
 	}
 	return assocs
