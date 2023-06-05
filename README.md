@@ -46,29 +46,38 @@ The downloaded XMI file is put in the `$HOME/.fint-model/.cache`. If you don't u
 
 ### Binaries
 
-Precompiled binaries are available as [Docker images](https://cloud.docker.com/u/fint/repository/docker/fint/fint-model)
+Precompiled binaries are available as [Docker images](https://github.com/FINTLabs/fint-model/pkgs/container/fint-model)
 
 Mount the directory where you want the generated source code to be written as `/src`.
 
 Linux / MacOS:
 ```bash
-docker run -v $(pwd):/src fint/fint-model:latest <ARGS>
+docker run -v $(pwd):/src ghcr.io/fintlabs/fint-model:latest <ARGS>
 ```
 
 Windows PowerShell:
 ```ps1
-docker run -v ${pwd}:/src fint/fint-model:latest <ARGS>
+docker run -v ${pwd}:/src ghcr.io/fintlabs/fint-model:latest <ARGS>
 ```
 
 ### Source
 
-To install, use `go get`:
+To install:
 
 ```bash
-go get -d github.com/FINTLabs/fint-model
-go install github.com/FINTLabs/fint-model
+gh repo clone fintlabs/fint-model
+cd fint-model
+go install
+```
+
+Update dependencies: 
+
+```bash
+go get .
+go mod vendor
+go build -a
 ```
 
 ## Author
 
-[FINTLabs](https://FINTLabs.github.io)
+[FINTLabs](https://fintlabs.no)
