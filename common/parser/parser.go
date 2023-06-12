@@ -9,7 +9,7 @@ import (
 	"github.com/FINTLabs/fint-model/common/document"
 	"github.com/FINTLabs/fint-model/common/types"
 	"github.com/FINTLabs/fint-model/common/utils"
-	"github.com/antchfx/xquery/xml"
+	xmlquery "github.com/antchfx/xquery/xml"
 )
 
 func GetClasses(owner string, repo string, tag string, filename string, force bool) ([]*types.Class, map[string]types.Import, map[string][]*types.Class, map[string][]*types.Class) {
@@ -33,6 +33,7 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 		class.Extends = getExtends(doc, c)
 		class.Attributes = getAttributes(c)
 		class.Relations = getAssociations(doc, c)
+		class.ExtendsRelations = getExtendsAssociations(doc, c)
 		class.Package = getPackagePath(c, doc)
 		class.Namespace = getNamespacePath(c, doc)
 		class.Identifiable = identifiable(class.Attributes)
@@ -311,8 +312,31 @@ func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 	return assocs
 }
 
-func replaceNO(s string) string {
+func getExtendsAssociations(doc *xmlquery.Node, c *xmlquery.Node) bool {
 
+	generalizationTargets := xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source[@idref='%s']/../target[@idref]", c.SelectAttr("idref")))
+
+	if len(generalizationTargets) == 1 && len(generalizationTargets[0].SelectAttr("idref")) > 0 {
+		idref := generalizationTargets[0].SelectAttr("idref")
+		associationQuery := [...]string{
+			fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role", idref),
+			fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role", idref),
+		}
+
+		for _, query := range associationQuery {
+			for _, r := range xmlquery.Find(doc, query) {
+				if len(r.SelectAttr("name")) > 0 {
+					return true
+				}
+			}
+		}
+
+	}
+
+	return false
+}
+
+func replaceNO(s string) string {
 	r := strings.Replace(s, "æ", "a", -1)
 	r = strings.Replace(r, "ø", "o", -1)
 	r = strings.Replace(r, "å", "a", -1)

@@ -15,7 +15,7 @@ namespace {{ .Namespace }}
 	{
 		{{- if .Relations }}
 		{{ $c := sub (len .Relations) 1 -}}
-		public {{ if .Extends -}} new {{ end -}} enum Relasjonsnavn
+		public {{ if .ExtendsRelations -}} new {{ end -}} enum Relasjonsnavn
         {
 		{{- range $i, $rel := .Relations }}
 			{{ $rel.Name | upperCase }}{{if ne $i $c }},{{ end -}}
