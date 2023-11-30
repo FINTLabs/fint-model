@@ -34,8 +34,24 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     {{ $c := sub (len .Relations) 1 -}}
     public enum Relasjonsnavn {
         {{- range $i, $rel := .Relations }}
-            {{ upperCase $rel.Name }}{{ if ne $i $c }},{{ end -}}
+            {{ upperCase $rel.Name }}("{{ $rel.Target }}", "{{ $rel.Multiplicity }}"){{ if ne $i $c }},{{ end -}}
         {{ end }}
+	
+		private final String typeName;
+        private final String multiplicity;
+
+        private Relasjonsnavn(String typeName, String multiplicity) {
+            this.typeName = typeName;
+            this.multiplicity = multiplicity;
+        }
+
+        public String getTypeName() {
+            return typeName;
+        }
+
+        public String getMultiplicity() {
+            return multiplicity;
+        }
     }
 {{ end -}}
 {{ if .Attributes }}
