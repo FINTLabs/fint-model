@@ -33,7 +33,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 
 {{- if .Relations }}
     {{ $c := sub (len .Relations) 1 -}}
-	@Getter
+    @Getter
     public enum Relasjonsnavn {
         {{- range $i, $rel := .Relations }}
             {{ upperCase $rel.Name }}("{{ $rel.Package }}.{{ $rel.Target }}", "{{ $rel.Multiplicity }}"){{ if ne $i $c }},{{ else }};{{ end -}}
