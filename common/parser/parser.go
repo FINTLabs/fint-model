@@ -172,10 +172,10 @@ func getPackagePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 
 	var pkgs []string
 	var parentPkg string
-	classPkg := getPackage(c) // Gets Package ID
-	pkgs = append(pkgs, getNameLower(classPkg, doc))
+	classPkgId := getPackage(c)
+	pkgs = append(pkgs, getNameLower(classPkgId, doc))
 
-	parentPkg = getParentPackage(classPkg, doc)
+	parentPkg = getParentPackage(classPkgId, doc)
 	for parentPkg != "" {
 		pkgs = append(pkgs, getNameLower(parentPkg, doc))
 		parentPkg = getParentPackage(parentPkg, doc)
