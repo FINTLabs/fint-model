@@ -39,7 +39,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
             {{ upperCase $rel.Name }}("{{ $rel.Package }}.{{ $rel.Target }}", "{{ $rel.Multiplicity }}"){{ if ne $i $c }},{{ else }};{{ end -}}
         {{ end }}
 	
-		private final String typeName;
+        private final String typeName;
         private final String multiplicity;
 
         private Relasjonsnavn(String typeName, String multiplicity) {
