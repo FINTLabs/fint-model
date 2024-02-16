@@ -13,6 +13,7 @@ import lombok.ToString;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -20,6 +21,7 @@ import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.{{ javaType .Stereotype }};
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
+import no.fint.model.FintIdentifikator;
 
 {{- if .Imports -}}
 {{ range $i := .Imports }}
@@ -68,8 +70,8 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
 
 {{- end }}
 
-    public Map<String, Identifikator> getIdentifikators() {
-    	Map<String, Identifikator> identifikators = new HashMap<>();
+    public Map<String, FintIdentifikator> getIdentifikators() {
+    	Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
     {{- if .Extends}}
 		identifikators.putAll(super.getIdentifikators());

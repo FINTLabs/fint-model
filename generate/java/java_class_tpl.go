@@ -9,13 +9,12 @@ import lombok.ToString;
 import lombok.Getter;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.{{ javaType .Stereotype }};
-{{- if eq .Name "Identifikator" }}
 import no.fint.model.FintIdentifikator;
-{{- end }}
 {{- if .Imports -}}
 {{ range $i := .Imports }}
 import {{ $i }};
@@ -54,8 +53,8 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     }
 {{ end }}
 
-	public Map<String, Identifikator> getIdentifikators() {
-    	Map<String, Identifikator> identifikators = new HashMap<>();
+	public Map<String, FintIdentifikator> getIdentifikators() {
+    	Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
     {{- if .Extends}}
 		identifikators.putAll(super.getIdentifikators());
