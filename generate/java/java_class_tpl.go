@@ -10,6 +10,7 @@ import lombok.Getter;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.{{ javaType .Stereotype }};
 {{- if .Imports -}}
 {{ range $i := .Imports }}
@@ -47,7 +48,24 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
             this.multiplicity = multiplicity;
         }
     }
-{{ end -}}
+{{ end }}
+
+	public Map<String, Identifikator> getIdentifikators() {
+    	Map<String, Identifikator> identifikators = new HashMap<>();
+
+    {{- if .Extends}}
+		identifikators.putAll(super.getIdentifikators());
+    {{- end}}
+
+    {{- range $att := .Attributes}}
+    {{- if eq $att.Type "Identifikator"}}
+		identifikators.put("{{ $att.Name }}", this.{{ $att.Name }});
+    {{- end}}
+    {{- end}}
+    
+    	return identifikators;
+	}
+
 {{ if .Attributes }}
     {{- range $att := .Attributes }}
     {{- if $att.Deprecated }}

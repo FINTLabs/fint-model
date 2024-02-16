@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
+import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.{{ javaType .Stereotype }};
 import no.fint.model.resource.FintLinks;
 import no.fint.model.resource.Link;
@@ -66,6 +67,22 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     {{- end }}
 
 {{- end }}
+
+    public Map<String, Identifikator> getIdentifikators() {
+    	Map<String, Identifikator> identifikators = new HashMap<>();
+
+    {{- if .Extends}}
+		identifikators.putAll(super.getIdentifikators());
+    {{- end}}
+
+    {{- range $att := .Attributes}}
+    {{- if eq $att.Type "Identifikator"}}
+		identifikators.put("{{ $att.Name }}", this.{{ $att.Name }});
+    {{- end}}
+    {{- end}}
+    
+    	return identifikators;
+	}
 
     // Relations
     @Getter
