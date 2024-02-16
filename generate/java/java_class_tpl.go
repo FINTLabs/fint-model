@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.Getter;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -32,10 +33,19 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 
 {{- if .Relations }}
     {{ $c := sub (len .Relations) 1 -}}
+    @Getter
     public enum Relasjonsnavn {
         {{- range $i, $rel := .Relations }}
-            {{ upperCase $rel.Name }}{{ if ne $i $c }},{{ end -}}
+            {{ upperCase $rel.Name }}("{{ $rel.Package }}.{{ $rel.Target }}", "{{ $rel.Multiplicity }}"){{ if ne $i $c }},{{ else }};{{ end -}}
         {{ end }}
+	
+        private final String typeName;
+        private final String multiplicity;
+
+        private Relasjonsnavn(String typeName, String multiplicity) {
+            this.typeName = typeName;
+            this.multiplicity = multiplicity;
+        }
     }
 {{ end -}}
 {{ if .Attributes }}

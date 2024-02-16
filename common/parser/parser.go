@@ -23,23 +23,23 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 	csPackageClassMap := make(map[string][]*types.Class)
 
 	classElements := xmlquery.Find(doc, "//element[@type='Class']")
-	for _, c := range classElements {
+	for _, classElement := range classElements {
 
-		properties := c.SelectElement("properties")
+		properties := classElement.SelectElement("properties")
 		class := new(types.Class)
 
-		class.Name = replaceNO(c.SelectAttr("name"))
+		class.Name = replaceNO(classElement.SelectAttr("name"))
 		class.Abstract = toBool(properties.SelectAttr("isAbstract"))
-		class.Extends = getExtends(doc, c)
-		class.Attributes = getAttributes(c)
-		class.Relations = getAssociations(doc, c)
-		class.ExtendsRelations = getExtendsAssociations(doc, c)
-		class.Package = getPackagePath(c, doc)
-		class.Namespace = getNamespacePath(c, doc)
+		class.Extends = getExtends(doc, classElement)
+		class.Attributes = getAttributes(classElement)
+		class.Relations = getAssociations(doc, classElement)
+		class.ExtendsRelations = getExtendsAssociations(doc, classElement)
+		class.Package = getPackagePath(classElement, doc)
+		class.Namespace = getNamespacePath(classElement, doc)
 		class.Identifiable = identifiable(class.Attributes)
 		class.Stereotype = properties.SelectAttr("stereotype")
 		class.Documentation = properties.SelectAttr("documentation")
-		class.Deprecated = c.SelectElement("tags/tag[@name='DEPRECATED']") != nil
+		class.Deprecated = classElement.SelectElement("tags/tag[@name='DEPRECATED']") != nil
 		class.GitTag = tag
 
 		if len(class.Stereotype) == 0 {
@@ -172,10 +172,10 @@ func getPackagePath(c *xmlquery.Node, doc *xmlquery.Node) string {
 
 	var pkgs []string
 	var parentPkg string
-	classPkg := getPackage(c)
-	pkgs = append(pkgs, getNameLower(classPkg, doc))
+	classPkgId := getPackage(c)
+	pkgs = append(pkgs, getNameLower(classPkgId, doc))
 
-	parentPkg = getParentPackage(classPkg, doc)
+	parentPkg = getParentPackage(classPkgId, doc)
 	for parentPkg != "" {
 		pkgs = append(pkgs, getNameLower(parentPkg, doc))
 		parentPkg = getParentPackage(parentPkg, doc)
@@ -298,18 +298,27 @@ func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 	}
 
 	for _, query := range queries {
-		for _, r := range xmlquery.Find(doc, query) {
-			if len(r.SelectAttr("name")) > 0 {
+		for _, relationElement := range xmlquery.Find(doc, query) {
+			if len(relationElement.SelectAttr("name")) > 0 {
+				classElement := findClassElementByID(doc, relationElement.Parent.SelectAttr("idref"))
+
 				assoc := types.Association{}
-				assoc.Name = replaceNO(r.SelectAttr("name"))
-				assoc.Target = replaceNO(r.SelectElement("../model").SelectAttr("name"))
-				assoc.Multiplicity = r.SelectElement("../type").SelectAttr("multiplicity")
-				assoc.Deprecated = r.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
+				assoc.Name = replaceNO(relationElement.SelectAttr("name"))
+				assoc.Target = replaceNO(relationElement.SelectElement("../model").SelectAttr("name"))
+				assoc.Multiplicity = relationElement.SelectElement("../type").SelectAttr("multiplicity")
+				assoc.Deprecated = relationElement.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
+				assoc.Package = getPackagePath(classElement, doc)
+
 				assocs = append(assocs, assoc)
 			}
 		}
 	}
 	return assocs
+}
+
+func findClassElementByID(doc *xmlquery.Node, id string) *xmlquery.Node {
+	query := fmt.Sprintf("//element[@type='Class'][@idref='%s']", id)
+	return xmlquery.FindOne(doc, query)
 }
 
 func getExtendsAssociations(doc *xmlquery.Node, c *xmlquery.Node) bool {
