@@ -12,6 +12,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.{{ javaType .Stereotype }};
+{{- if eq .Name "Identifikator" }}
+import no.fint.model.FintIdentifikator;
+{{- end }}
 {{- if .Imports -}}
 {{ range $i := .Imports }}
 import {{ $i }};
@@ -30,7 +33,7 @@ import {{ $i }};
 {{ if .Deprecated -}}
 @Deprecated
 {{ end -}}
-public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extends {{ .Extends }} {{ end -}} implements {{ javaType .Stereotype }} {
+public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extends {{ .Extends }} {{ end }} implements {{ javaType .Stereotype }}{{ if eq .Name "Identifikator"}}, FintIdentifikator{{ end }} {
 
 {{- if .Relations }}
     {{ $c := sub (len .Relations) 1 -}}
