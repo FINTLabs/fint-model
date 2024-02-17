@@ -2,6 +2,8 @@ package java
 
 const CLASS_TEMPLATE = `package {{ .Package }};
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -52,7 +54,8 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
         }
     }
 {{ end }}
-
+	
+	@JsonIgnore
 	public Map<String, FintIdentifikator> getIdentifikators() {
     	Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
