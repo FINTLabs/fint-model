@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Getter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -79,6 +80,9 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     	return identifikators;
 	}
 
+{{ if .Relations }}
+	private final List<FintRelation> relations = new ArrayList<>(List.of(Relasjonsnavn.values()));
+{{- end -}}
 {{ if .Attributes }}
     {{- range $att := .Attributes }}
     {{- if $att.Deprecated }}
