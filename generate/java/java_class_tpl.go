@@ -17,6 +17,7 @@ import javax.validation.constraints.*;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.{{ javaType .Stereotype }};
 import no.fint.model.FintIdentifikator;
+import no.fint.model.FintRelation;
 {{- if .Imports -}}
 {{ range $i := .Imports }}
 import {{ $i }};
@@ -40,7 +41,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 {{- if .Relations }}
     {{ $c := sub (len .Relations) 1 -}}
     @Getter
-    public enum Relasjonsnavn {
+    public enum Relasjonsnavn implements FintRelation {
         {{- range $i, $rel := .Relations }}
             {{ upperCase $rel.Name }}("{{ $rel.Package }}.{{ $rel.Target }}", "{{ $rel.Multiplicity }}"){{ if ne $i $c }},{{ else }};{{ end -}}
         {{ end }}
