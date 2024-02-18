@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.HashMap;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import no.fint.model.FintMultiplicity;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.{{ javaType .Stereotype }};
 import no.fint.model.FintIdentifikator;
@@ -23,6 +24,11 @@ import no.fint.model.FintRelation;
 import {{ $i }};
 {{- end -}}
 {{ end }}
+
+import static no.fint.model.FintMultiplicity.ONE_TO_ONE;
+import static no.fint.model.FintMultiplicity.ONE_TO_MANY;
+import static no.fint.model.FintMultiplicity.NONE_TO_ONE;
+import static no.fint.model.FintMultiplicity.NONE_TO_MANY;
 
 @Data
 @NoArgsConstructor
@@ -43,13 +49,13 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     @Getter
     public enum Relasjonsnavn implements FintRelation {
         {{- range $i, $rel := .Relations }}
-            {{ upperCase $rel.Name }}("{{ $rel.Package }}.{{ $rel.Target }}", "{{ $rel.Multiplicity }}"){{ if ne $i $c }},{{ else }};{{ end -}}
+            {{ upperCase $rel.Name }}("{{ $rel.Package }}.{{ $rel.Target }}", {{ resolveMultiplicity $rel.Multiplicity }}){{ if ne $i $c }},{{ else }};{{ end -}}
         {{ end }}
 	
         private final String typeName;
-        private final String multiplicity;
+        private final FintMultiplicity multiplicity;
 
-        private Relasjonsnavn(String typeName, String multiplicity) {
+        private Relasjonsnavn(String typeName, FintMultiplicity multiplicity) {
             this.typeName = typeName;
             this.multiplicity = multiplicity;
         }

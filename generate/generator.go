@@ -69,6 +69,20 @@ var funcMap = template.FuncMap{
 		}
 		return ""
 	},
+	"resolveMultiplicity": func(multiplicity string) string {
+		switch multiplicity {
+		case "1":
+			return "ONE_TO_ONE"
+		case "0..*":
+			return "NONE_TO_MANY"
+		case "0..1":
+			return "NONE_TO_ONE"
+		case "1..*":
+			return "ONE_TO_MANY"
+		default:
+			return multiplicity
+		}
+	},
 }
 
 func GetJavaResourceClass(c *types.Class) string {
