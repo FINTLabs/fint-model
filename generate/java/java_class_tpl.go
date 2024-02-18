@@ -83,6 +83,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 	}
 
 {{ if .Relations }}
+	@JsonIgnore
 	private final List<FintRelation> relations = new ArrayList<>(List.of(Relasjonsnavn.values()));
 {{- end -}}
 {{ if .Attributes }}
