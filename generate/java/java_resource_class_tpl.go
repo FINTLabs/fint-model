@@ -70,11 +70,11 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
 
 {{- end }}
 
-	@JsonIgnore
-    public Map<String, FintIdentifikator> getIdentifikators() {
+{{- if .Identifiable }}
+	public Map<String, FintIdentifikator> getIdentifikators() {
     	Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
-    {{- if .Extends}}
+    {{- if .ExtendsIdentifiable}}
 		identifikators.putAll(super.getIdentifikators());
     {{- end}}
 
@@ -86,6 +86,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     
     	return identifikators;
 	}
+{{- end }}
 
     // Relations
     @Getter

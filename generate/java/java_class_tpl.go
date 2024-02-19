@@ -63,13 +63,13 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
             this.multiplicity = multiplicity;
         }
     }
-{{ end }}
+{{ end -}}
 	
-	@JsonIgnore
+{{- if .Identifiable }}
 	public Map<String, FintIdentifikator> getIdentifikators() {
     	Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
-    {{- if .Extends}}
+    {{- if .ExtendsIdentifiable}}
 		identifikators.putAll(super.getIdentifikators());
     {{- end}}
 
@@ -81,12 +81,13 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     
     	return identifikators;
 	}
+{{- end }}
 
-{{ if .Relations }}
+{{- if .Relations }}
 	@JsonIgnore
 	private final List<FintRelation> relations = new ArrayList<>(List.of(Relasjonsnavn.values()));
-{{- end -}}
-{{ if .Attributes }}
+{{- end }}
+{{- if .Attributes }}
     {{- range $att := .Attributes }}
     {{- if $att.Deprecated }}
     @Deprecated
