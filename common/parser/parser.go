@@ -66,6 +66,7 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 		class.Imports = getImports(class, packageMap)
 		class.Using = getUsing(class, packageMap)
 		class.Identifiable = identifiableFromExtends(class, classMap)
+		class.ExtendsIdentifiable = isExtendsIdentifiable(class, classMap)
 		class.Resource = isResource(class, classMap)
 		javaPackageClassMap[class.Package] = append(javaPackageClassMap[class.Package], class)
 		csPackageClassMap[class.Namespace] = append(csPackageClassMap[class.Namespace], class)
@@ -113,6 +114,13 @@ func identifiableFromExtends(class *types.Class, classMap map[string]*types.Clas
 	if class.Identifiable {
 		return true
 	}
+	if len(class.Extends) > 0 {
+		return identifiableFromExtends(classMap[class.Extends], classMap)
+	}
+	return false
+}
+
+func isExtendsIdentifiable(class *types.Class, classMap map[string]*types.Class) bool {
 	if len(class.Extends) > 0 {
 		return identifiableFromExtends(classMap[class.Extends], classMap)
 	}
