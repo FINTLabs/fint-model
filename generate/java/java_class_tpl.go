@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Getter;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 
 {{- if .Relations }}
 	@JsonIgnore
-	private final List<FintRelation> relations = new ArrayList<>(List.of(Relasjonsnavn.values()));
+	private final List<FintRelation> relations = new ArrayList<>(Arrays.asList(FintRelation.values()));
 {{- end }}
 {{- if .Attributes }}
     {{- range $att := .Attributes }}
