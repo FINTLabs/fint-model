@@ -18,8 +18,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
-import no.fint.model.{{ javaType .Stereotype }};
 import no.fint.model.resource.FintLinks;
+import no.fint.model.resource.FintResource;
 import no.fint.model.resource.Link;
 import no.fint.model.FintIdentifikator;
 
@@ -41,7 +41,7 @@ import {{ resource $.Resources $i | extends $.ExtendsResource $.Extends }};
 {{ if .Deprecated -}}
 @Deprecated
 {{ end -}}
-public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} extends {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end -}} implements {{ javaType .Stereotype }}, FintLinks {
+public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} extends {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end -}} implements FintResource, FintLinks {
 
 {{- if .Attributes }}
     // Attributes
