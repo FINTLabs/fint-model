@@ -83,6 +83,18 @@ var funcMap = template.FuncMap{
 			return multiplicity
 		}
 	},
+	"metaRename": func(s string) string {
+		if s == "FintMainObject" {
+			return "FintMetaObject"
+		}
+		return s
+	},
+	"resourceRename": func(s string) string {
+		if s == "FintMainObject" {
+			return "FintResource"
+		}
+		return s
+	},
 }
 
 func GetJavaResourceClass(c *types.Class) string {
