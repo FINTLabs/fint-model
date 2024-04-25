@@ -11,7 +11,7 @@ var JAVA_TYPE_MAP = map[string]string{
 	"double":      "Double",
 	"long":        "Long",
 	"int":         "Integer",
-	"hovedklasse": "FintMetaObject",
+	"hovedklasse": "FintMainObject",
 	"referanse":   "FintReference",
 	"abstrakt":    "FintAbstractObject",
 	"datatype":    "FintComplexDatatypeObject",
