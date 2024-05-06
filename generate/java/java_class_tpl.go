@@ -51,15 +51,15 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     @Getter
     public enum Relasjonsnavn implements FintRelation {
         {{- range $i, $rel := .Relations }}
-            {{ upperCase $rel.Name }}("{{ $rel.Name }}", "{{ $rel.Package }}.{{ $rel.Target }}", {{ resolveMultiplicity $rel.Multiplicity }}){{ if ne $i $c }},{{ else }};{{ end -}}
+        {{ upperCase $rel.Name }}("{{ $rel.Name }}", "{{ $rel.Package }}.{{ $rel.Target }}", {{ resolveMultiplicity $rel.Multiplicity }}){{ if ne $i $c }},{{ else }};{{ end -}}
         {{ end }}
 	
-		private final String name;
+        private final String name;
         private final String packageName;
         private final FintMultiplicity multiplicity;
 
         private Relasjonsnavn(String name, String packageName, FintMultiplicity multiplicity) {
-			this.name = name;
+            this.name = name;
             this.packageName = packageName;
             this.multiplicity = multiplicity;
         }
