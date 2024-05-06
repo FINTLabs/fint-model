@@ -13,12 +13,15 @@ import lombok.ToString;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
-import no.fint.model.{{ javaType .Stereotype }};
+import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.FintLinks;
+import no.fint.model.{{ resourceRename (javaType .Stereotype) }};
 import no.fint.model.resource.Link;
+import no.fint.model.FintIdentifikator;
 
 {{- if .Imports -}}
 {{ range $i := .Imports }}
@@ -38,7 +41,7 @@ import {{ resource $.Resources $i | extends $.ExtendsResource $.Extends }};
 {{ if .Deprecated -}}
 @Deprecated
 {{ end -}}
-public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} extends {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end -}} implements {{ javaType .Stereotype }}, FintLinks {
+public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} extends {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end -}} implements {{ resourceRename (javaType .Stereotype) }}, FintLinks {
 
 {{- if .Attributes }}
     // Attributes
@@ -65,6 +68,25 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     private {{ javaType $att.Type | resource $.Resources | validFilt $att.Type | listFilt $att.List }} {{ $att.Name }};
     {{- end }}
 
+{{- end }}
+
+{{- if .Identifiable }}
+    @JsonIgnore
+    public Map<String, FintIdentifikator> getIdentifikators() {
+        Map<String, FintIdentifikator> identifikators = new HashMap<>();
+
+    {{- if .ExtendsIdentifiable}}
+        identifikators.putAll(super.getIdentifikators());
+    {{- end}}
+
+    {{- range $att := .Attributes}}
+    {{- if eq $att.Type "Identifikator"}}
+        identifikators.put("{{ $att.Name }}", this.{{ $att.Name }});
+    {{- end}}
+    {{- end}}
+    
+        return identifikators;
+    }
 {{- end }}
 
     // Relations
