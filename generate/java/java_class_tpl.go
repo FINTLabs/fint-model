@@ -18,7 +18,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 import no.fint.model.FintMultiplicity;
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
-import no.fint.model.{{ metaRename (javaType .Stereotype) }};
+import no.fint.model.{{ modelRename (javaType .Stereotype) }};
 import no.fint.model.FintIdentifikator;
 import no.fint.model.FintRelation;
 {{- if .Imports -}}
@@ -44,7 +44,7 @@ import static no.fint.model.FintMultiplicity.NONE_TO_MANY;
 {{ if .Deprecated -}}
 @Deprecated
 {{ end -}}
-public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extends {{ .Extends }} {{ end }} implements {{ metaRename (javaType .Stereotype) }}{{ if eq .Name "Identifikator"}}, FintIdentifikator{{ end }} {
+public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends -}} extends {{ .Extends }} {{ end }} implements {{ modelRename (javaType .Stereotype) }}{{ if eq .Name "Identifikator"}}, FintIdentifikator{{ end }} {
 
 {{- if .Relations }}
     {{ $c := sub (len .Relations) 1 -}}

@@ -83,15 +83,15 @@ var funcMap = template.FuncMap{
 			return multiplicity
 		}
 	},
-	"metaRename": func(s string) string {
+	"modelRename": func(s string) string {
 		if s == "FintMainObject" {
-			return "FintMetaObject"
+			return "FintModelObject"
 		}
 		return s
 	},
 	"resourceRename": func(s string) string {
 		if s == "FintMainObject" {
-			return "FintResource"
+			return "FintResourceObject"
 		}
 		return s
 	},
