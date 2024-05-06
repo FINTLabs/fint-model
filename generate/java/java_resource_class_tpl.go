@@ -71,22 +71,22 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
 {{- end }}
 
 {{- if .Identifiable }}
-	@JsonIgnore
-	public Map<String, FintIdentifikator> getIdentifikators() {
-    	Map<String, FintIdentifikator> identifikators = new HashMap<>();
+    @JsonIgnore
+    public Map<String, FintIdentifikator> getIdentifikators() {
+        Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
     {{- if .ExtendsIdentifiable}}
-		identifikators.putAll(super.getIdentifikators());
+        identifikators.putAll(super.getIdentifikators());
     {{- end}}
 
     {{- range $att := .Attributes}}
     {{- if eq $att.Type "Identifikator"}}
-		identifikators.put("{{ $att.Name }}", this.{{ $att.Name }});
+        identifikators.put("{{ $att.Name }}", this.{{ $att.Name }});
     {{- end}}
     {{- end}}
     
-    	return identifikators;
-	}
+        return identifikators;
+    }
 {{- end }}
 
     // Relations

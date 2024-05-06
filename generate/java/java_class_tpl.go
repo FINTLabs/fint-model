@@ -53,7 +53,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
         {{- range $i, $rel := .Relations }}
         {{ upperCase $rel.Name }}("{{ $rel.Name }}", "{{ $rel.Package }}.{{ $rel.Target }}", {{ resolveMultiplicity $rel.Multiplicity }}){{ if ne $i $c }},{{ else }};{{ end -}}
         {{ end }}
-	
+    
         private final String name;
         private final String packageName;
         private final FintMultiplicity multiplicity;
@@ -65,29 +65,29 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
         }
     }
 {{ end -}}
-	
+    
 {{- if .Identifiable }}
-	@JsonIgnore
-	public Map<String, FintIdentifikator> getIdentifikators() {
-    	Map<String, FintIdentifikator> identifikators = new HashMap<>();
+    @JsonIgnore
+    public Map<String, FintIdentifikator> getIdentifikators() {
+        Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
     {{- if .ExtendsIdentifiable}}
-		identifikators.putAll(super.getIdentifikators());
+        identifikators.putAll(super.getIdentifikators());
     {{- end}}
 
     {{- range $att := .Attributes}}
     {{- if eq $att.Type "Identifikator"}}
-		identifikators.put("{{ $att.Name }}", this.{{ $att.Name }});
+        identifikators.put("{{ $att.Name }}", this.{{ $att.Name }});
     {{- end}}
     {{- end}}
     
-    	return identifikators;
-	}
+        return identifikators;
+    }
 {{- end }}
 
 {{- if .Relations }}
-	@JsonIgnore
-	private final List<FintRelation> relations = new ArrayList<>(Arrays.asList(Relasjonsnavn.values()));
+    @JsonIgnore
+    private final List<FintRelation> relations = new ArrayList<>(Arrays.asList(Relasjonsnavn.values()));
 {{- end }}
 {{- if .Attributes }}
     {{- range $att := .Attributes }}
