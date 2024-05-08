@@ -91,7 +91,7 @@ var funcMap = template.FuncMap{
     },
     "resourceRename": func(s string) string {
         if s == "FintMainObject" {
-            return "FintResourceObject"
+            return "FintResource"
         }
         return s
     },
