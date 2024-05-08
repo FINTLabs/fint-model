@@ -49,7 +49,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     @JsonIgnore
     @Override
     public List<FintLinks> getNestedResources() {
-        List<FintLinks> result = {{ if not .ExtendsResource }}FintLinks.{{end}}super.getNestedResources();
+        List<FintLinks> result = {{ if not .ExtendsResource }}{{ superResource .Stereotype }}.{{end}}super.getNestedResources();
         {{- range $att := .Resources }}
         if ({{$att.Name}} != null) {
             result.add{{if $att.List}}All{{end}}({{$att.Name}});
