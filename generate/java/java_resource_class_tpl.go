@@ -41,7 +41,7 @@ import {{ resource $.Resources $i | extends $.ExtendsResource $.Extends }};
 {{ if .Deprecated -}}
 @Deprecated
 {{ end -}}
-public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} extends {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end -}} implements {{ resourceRename (javaType .Stereotype) }}, FintLinks {
+public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} extends {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end -}} implements {{ implementInterfaces (resourceRename (javaType .Stereotype)) }} {
 
 {{- if .Attributes }}
     // Attributes
