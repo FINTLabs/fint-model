@@ -101,6 +101,18 @@ var funcMap = template.FuncMap{
 		}
 		return s
 	},
+	"implementInterfaces": func(s string) string {
+		if s == "FintResource" {
+			return s
+		}
+		return s + ", FintLinks"
+	},
+	"superResource": func(s string) string {
+		if s == "FintMainObject" {
+			return "FintResource"
+		}
+		return "FintLinks"
+	},
 }
 
 func GetJavaResourceClass(c *types.Class) string {
