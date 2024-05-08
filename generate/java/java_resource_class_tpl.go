@@ -19,7 +19,7 @@ import javax.validation.constraints.*;
 
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.FintLinks;
-import no.fint.model.{{ resourceRename (javaType .Stereotype) }};
+import no.fint.model.{{ resourcePackageRename (javaType .Stereotype) }};
 import no.fint.model.resource.Link;
 import no.fint.model.FintIdentifikator;
 
