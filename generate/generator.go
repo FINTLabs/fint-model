@@ -91,9 +91,27 @@ var funcMap = template.FuncMap{
     },
     "resourceRename": func(s string) string {
         if s == "FintMainObject" {
-            return "FintResourceObject"
+            return "FintResource"
         }
         return s
+    },
+    "resourcePackageRename": func(s string) string {
+        if s == "FintMainObject" {
+            return "resource.FintResource"
+        }
+        return s
+    },
+    "implementInterfaces": func(s string) string {
+        if s == "FintResource" {
+            return s
+        }
+        return s + ", FintLinks"
+    },
+    "superResource": func(s string) string {
+        if s == "hovedklasse" {
+            return "FintResource"
+        }
+        return "FintLinks"
     },
 }
 

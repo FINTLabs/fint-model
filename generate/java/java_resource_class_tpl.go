@@ -19,7 +19,7 @@ import javax.validation.constraints.*;
 
 import no.fint.model.felles.kompleksedatatyper.Identifikator;
 import no.fint.model.resource.FintLinks;
-import no.fint.model.{{ resourceRename (javaType .Stereotype) }};
+import no.fint.model.{{ resourcePackageRename (javaType .Stereotype) }};
 import no.fint.model.resource.Link;
 import no.fint.model.FintIdentifikator;
 
@@ -41,7 +41,7 @@ import {{ resource $.Resources $i | extends $.ExtendsResource $.Extends }};
 {{ if .Deprecated -}}
 @Deprecated
 {{ end -}}
-public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} extends {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end -}} implements {{ resourceRename (javaType .Stereotype) }}, FintLinks {
+public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .Extends -}} extends {{ .Extends }}{{ if .ExtendsResource }}Resource{{ end }} {{ end -}} implements {{ implementInterfaces (resourceRename (javaType .Stereotype)) }} {
 
 {{- if .Attributes }}
     // Attributes
@@ -49,7 +49,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
     @JsonIgnore
     @Override
     public List<FintLinks> getNestedResources() {
-        List<FintLinks> result = {{ if not .ExtendsResource }}FintLinks.{{end}}super.getNestedResources();
+        List<FintLinks> result = {{ if not .ExtendsResource }}{{ superResource .Stereotype }}.{{end}}super.getNestedResources();
         {{- range $att := .Resources }}
         if ({{$att.Name}} != null) {
             result.add{{if $att.List}}All{{end}}({{$att.Name}});
