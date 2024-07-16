@@ -85,6 +85,15 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     }
 {{- end }}
 
+{{- if eq .Stereotype "hovedklasse" }}
+    public boolean isWriteable() {
+        return this.writeable;
+    }
+
+    private final boolean writeable = {{ .Writable }};
+{{- end }}
+
+
 {{- if .Relations }}
     @JsonIgnore
     private final List<FintRelation> relations = new ArrayList<>(Arrays.asList(Relasjonsnavn.values()));
