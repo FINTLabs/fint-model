@@ -20,4 +20,5 @@ type Class struct {
     GitTag              string
     Stereotype          string
     ExtendsIdentifiable bool
+    Writeable           bool
 }
