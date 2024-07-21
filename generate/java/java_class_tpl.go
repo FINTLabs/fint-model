@@ -85,7 +85,6 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     }
 {{- end }}
 
-{{- if eq .Stereotype "hovedklasse" }}
     @Override
     public boolean isWriteable() {
         return this.writeable;
