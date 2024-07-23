@@ -85,7 +85,6 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     }
 {{- end }}
 
-    @Override
     public boolean isWriteable() {
         return this.writeable;
     }
