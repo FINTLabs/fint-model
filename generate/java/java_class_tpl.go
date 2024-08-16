@@ -89,6 +89,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
         return this.writeable;
     }
 
+    @JsonIgnore
     private final boolean writeable = {{ .Writable }};
 
 {{- if .Relations }}
