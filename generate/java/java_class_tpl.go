@@ -85,6 +85,13 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     }
 {{- end }}
 
+    public boolean isWriteable() {
+        return this.writeable;
+    }
+
+    @JsonIgnore
+    private final boolean writeable = {{ .Writable }};
+
 {{- if .Relations }}
     @JsonIgnore
     private final List<FintRelation> relations = new ArrayList<>(Arrays.asList(Relasjonsnavn.values()));
