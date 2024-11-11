@@ -72,10 +72,8 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
 
 {{- if .Identifiable }}
     @JsonIgnore
-    private final Map<String, FintIdentifikator> identifikators = createIdentifikators();
-
-    @JsonIgnore
-    private Map<String, FintIdentifikator> createIdentifikators() {
+    @Override
+    private Map<String, FintIdentifikator> getIdentifikators() {
         Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
         {{- if .ExtendsIdentifiable}}
@@ -90,7 +88,6 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }}Resource {{ if .
 
         return Collections.unmodifiableMap(identifikators);
     }
-
 {{- end }}
 
     // Relations

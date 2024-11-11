@@ -69,7 +69,8 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     
 {{- if .Identifiable }}
     @JsonIgnore
-    private Map<String, FintIdentifikator> createIdentifikators() {
+    @Override
+    private Map<String, FintIdentifikator> getIdentifikators() {
         Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
         {{- if .ExtendsIdentifiable}}
@@ -111,10 +112,6 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 {{- if .Relations }}
     @JsonIgnore
     private final List<FintRelation> relations = createRelations();
-{{- end }}
-{{- if .Identifiable }}
-    @JsonIgnore
-    private final Map<String, FintIdentifikator> identifikators = createIdentifikators();
 {{- end }}
 {{- if .Attributes }}
     {{- range $att := .Attributes }}
