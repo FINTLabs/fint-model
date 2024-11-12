@@ -69,7 +69,6 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     
 {{- if .Identifiable }}
     @JsonIgnore
-    @Override
     public Map<String, FintIdentifikator> getIdentifikators() {
         Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
