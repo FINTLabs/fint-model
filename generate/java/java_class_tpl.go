@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Getter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,17 +72,32 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     public Map<String, FintIdentifikator> getIdentifikators() {
         Map<String, FintIdentifikator> identifikators = new HashMap<>();
 
-    {{- if .ExtendsIdentifiable}}
+        {{- if .ExtendsIdentifiable}}
         identifikators.putAll(super.getIdentifikators());
-    {{- end}}
+        {{- end}}
 
-    {{- range $att := .Attributes}}
-    {{- if eq $att.Type "Identifikator"}}
+        {{- range $att := .Attributes }}
+        {{- if eq $att.Type "Identifikator" }}
         identifikators.put("{{ $att.Name }}", this.{{ $att.Name }});
-    {{- end}}
-    {{- end}}
-    
-        return identifikators;
+        {{- end }}
+        {{- end }}
+
+        return Collections.unmodifiableMap(identifikators);
+    }
+{{- end }}
+
+{{- if .Relations }}
+    @JsonIgnore
+    private List<FintRelation> createRelations() {
+        List<FintRelation> relations = new ArrayList<>();
+
+        {{- if .ExtendsRelations }}
+        relations.addAll(super.getRelations());
+        {{- end }}
+
+        relations.addAll(Arrays.asList(Relasjonsnavn.values()));
+
+        return Collections.unmodifiableList(relations);
     }
 {{- end }}
 
@@ -94,7 +110,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
 
 {{- if .Relations }}
     @JsonIgnore
-    private final List<FintRelation> relations = new ArrayList<>(Arrays.asList(Relasjonsnavn.values()));
+    private final List<FintRelation> relations = createRelations();
 {{- end }}
 {{- if .Attributes }}
     {{- range $att := .Attributes }}
