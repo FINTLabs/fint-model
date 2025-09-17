@@ -108,7 +108,7 @@ func generateJavaCode(owner string, repo string, tag string, filename string, fo
 }
 
 func removeJavaPackagePathFromFilePath(path string) string {
-	return strings.Replace(path, "no/fint/model/", "", -1)
+	return strings.Replace(path, "no/novari/fint/model/", "", -1)
 }
 
 func getAction(p string, cl []*types.Class, tag string) types.Action {
