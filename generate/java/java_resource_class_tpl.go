@@ -17,11 +17,11 @@ import java.util.HashMap;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
-import no.fint.model.felles.kompleksedatatyper.Identifikator;
-import no.fint.model.resource.FintLinks;
-import no.fint.model.{{ resourcePackageRename (javaType .Stereotype) }};
-import no.fint.model.resource.Link;
-import no.fint.model.FintIdentifikator;
+import no.novari.fint.model.felles.kompleksedatatyper.Identifikator;
+import no.novari.fint.model.resource.FintLinks;
+import no.novari.fint.model.{{ resourcePackageRename (javaType .Stereotype) }};
+import no.novari.fint.model.resource.Link;
+import no.novari.fint.model.FintIdentifikator;
 
 {{- if .Imports -}}
 {{ range $i := .Imports }}

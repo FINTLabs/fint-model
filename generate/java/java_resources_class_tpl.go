@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import lombok.NoArgsConstructor;
-import no.fint.model.resource.AbstractCollectionResources;
+import no.novari.fint.model.resource.AbstractCollectionResources;
 
 @NoArgsConstructor
 {{ if .Deprecated -}}
