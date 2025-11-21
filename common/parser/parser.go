@@ -354,28 +354,64 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 	return attributes
 }
 
+func BuildAssociationQueries(idref string) []types.AssociationQuery {
+	return []types.AssociationQuery{
+		{
+			XPath: fmt.Sprintf(
+				"//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role",
+				idref,
+			),
+			Role: types.RoleSource,
+		},
+		{
+			XPath: fmt.Sprintf(
+				"//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role",
+				idref,
+			),
+			Role: types.RoleTarget,
+		},
+	}
+}
+
 func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 	var assocs []types.Association
 
-	queries := [...]string{
-		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role", c.SelectAttr("idref")),
-		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role", c.SelectAttr("idref")),
-	}
+	queries := BuildAssociationQueries(c.SelectAttr("idref"))
 
-	for _, query := range queries {
-		for _, relationElement := range xmlquery.Find(doc, query) {
-			if len(relationElement.SelectAttr("name")) > 0 {
-				classElement := findClassElementByID(doc, relationElement.Parent.SelectAttr("idref"))
-
-				assoc := types.Association{}
-				assoc.Name = replaceNO(relationElement.SelectAttr("name"))
-				assoc.Target = replaceNO(relationElement.SelectElement("../model").SelectAttr("name"))
-				assoc.Multiplicity = relationElement.SelectElement("../type").SelectAttr("multiplicity")
-				assoc.Deprecated = relationElement.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
-				assoc.Package = getPackagePath(classElement, doc)
-
-				assocs = append(assocs, assoc)
+	for _, q := range queries {
+		for _, relationElement := range xmlquery.Find(doc, q.XPath) {
+			if len(relationElement.SelectAttr("name")) == 0 {
+				continue
 			}
+
+			props := relationElement.SelectElement("../../properties")
+			direction := ""
+			if props != nil {
+				direction = props.SelectAttr("direction")
+			}
+
+			classElement := findClassElementByID(doc, relationElement.Parent.SelectAttr("idref"))
+
+			assoc := types.Association{}
+			assoc.Name = replaceNO(relationElement.SelectAttr("name"))
+			assoc.Target = replaceNO(relationElement.SelectElement("../model").SelectAttr("name"))
+			assoc.Multiplicity = relationElement.SelectElement("../type").SelectAttr("multiplicity")
+			assoc.Package = getPackagePath(classElement, doc)
+			assoc.Deprecated = relationElement.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
+
+			if classElement != nil {
+
+			}
+
+			if direction == "Bi-Directional" {
+				if q.Role == "source" {
+					assoc.Source = replaceNO(relationElement.SelectElement("../../source/role").SelectAttr("name"))
+				} else {
+					assoc.Source = replaceNO(relationElement.SelectElement("../../target/role").SelectAttr("name"))
+				}
+			}
+
+			assocs = append(assocs, assoc)
 		}
 	}
 	return assocs
