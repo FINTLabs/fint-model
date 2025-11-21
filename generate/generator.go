@@ -3,6 +3,7 @@ package generate
 import (
 	"bytes"
 	"fmt"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -82,6 +83,12 @@ var funcMap = template.FuncMap{
 		default:
 			return multiplicity
 		}
+	},
+	"resolveSource": func(source string) string {
+		if source == "" {
+			return "null"
+		}
+		return strconv.Quote(source)
 	},
 	"modelRename": func(s string) string {
 		if s == "FintMainObject" {
