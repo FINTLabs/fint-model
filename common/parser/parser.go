@@ -354,7 +354,7 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 	return attributes
 }
 
-func BuildAssociationQueries(idref string) []types.AssociationQuery {
+func buildAssociationQueries(idref string) []types.AssociationQuery {
 	return []types.AssociationQuery{
 		{
 			XPath: fmt.Sprintf(
@@ -376,7 +376,7 @@ func BuildAssociationQueries(idref string) []types.AssociationQuery {
 func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 	var assocs []types.Association
 
-	queries := BuildAssociationQueries(c.SelectAttr("idref"))
+	queries := buildAssociationQueries(c.SelectAttr("idref"))
 
 	for _, q := range queries {
 		for _, relationElement := range xmlquery.Find(doc, q.XPath) {
@@ -409,6 +409,15 @@ func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 				} else {
 					assoc.Source = replaceNO(relationElement.SelectElement("../../target/role").SelectAttr("name"))
 				}
+			} else {
+				// If not bi-directional, check if target class inherits from a class with bi-directional association back
+				targetIdref := relationElement.Parent.SelectAttr("idref")
+				if len(targetIdref) > 0 {
+					inverseName := getInverseNameFromParentClass(doc, c.SelectAttr("idref"), targetIdref)
+					if len(inverseName) > 0 {
+						assoc.Source = inverseName
+					}
+				}
 			}
 
 			assocs = append(assocs, assoc)
@@ -420,6 +429,42 @@ func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 func findClassElementByID(doc *xmlquery.Node, id string) *xmlquery.Node {
 	query := fmt.Sprintf("//element[@type='Class'][@idref='%s']", id)
 	return xmlquery.FindOne(doc, query)
+}
+
+// getInverseNameFromParentClass checks if targetClassIdref inherits from a class that has a bi-directional
+// association back to sourceClassIdref, and returns the inverse name if found
+func getInverseNameFromParentClass(doc *xmlquery.Node, sourceClassIdref string, targetClassIdref string) string {
+	// Find generalization targets for the target class (what does target inherit from?)
+	generalizationTargets := xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source[@idref='%s']/../target[@idref]", targetClassIdref))
+
+	if len(generalizationTargets) != 1 {
+		return ""
+	}
+
+	parentIdref := generalizationTargets[0].SelectAttr("idref")
+	if len(parentIdref) == 0 {
+		return ""
+	}
+
+	// Check if parent class has a bi-directional association back to our source class
+	// We want to return the inverse name from the source class perspective
+	queries := []string{
+		// When parent is source and sourceClass is target, return target's role (sourceClass's role)
+		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association'][@direction='Bi-Directional']/../source[@idref='%s']/../target[@idref='%s']/../target/role", parentIdref, sourceClassIdref),
+		// When parent is target and sourceClass is source, return source's role (sourceClass's role)
+		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association'][@direction='Bi-Directional']/../target[@idref='%s']/../source[@idref='%s']/../source/role", parentIdref, sourceClassIdref),
+	}
+
+	for _, query := range queries {
+		for _, roleElement := range xmlquery.Find(doc, query) {
+			roleName := roleElement.SelectAttr("name")
+			if len(roleName) > 0 {
+				return replaceNO(roleName)
+			}
+		}
+	}
+
+	return ""
 }
 
 func getExtendsAssociations(doc *xmlquery.Node, c *xmlquery.Node) bool {
