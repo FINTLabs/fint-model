@@ -61,7 +61,7 @@ func getFilePath(tag string) string {
 		os.Exit(2)
 	}
 
-	outFileName := fmt.Sprintf("%s/%s.xml", dir, tag)
+	outFileName := fmt.Sprintf("%s/%s.xml", dir, strings.Replace(tag, "/", "-", -1))
 
 	return outFileName
 }
