@@ -16,6 +16,7 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 	doc := document.Get(owner, repo, tag, filename, force)
 
 	var classes []*types.Class
+	// TODO BUG: packageMap and classMap fail for classes with the same name!
 	packageMap := make(map[string]types.Import)
 	classMap := make(map[string]*types.Class)
 	javaPackageClassMap := make(map[string][]*types.Class)
@@ -51,12 +52,9 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 			Java:   fmt.Sprintf("%s.%s", class.Package, class.Name),
 			CSharp: class.Namespace,
 		}
-		mapKey := fmt.Sprintf("%s.%s", class.Package, class.Name)
-		packageMap[mapKey] = imp
 		packageMap[class.Name] = imp
 
 		classes = append(classes, class)
-		classMap[mapKey] = class
 		classMap[class.Name] = class
 	}
 
@@ -94,7 +92,7 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 
 	for _, class := range classes {
 		if len(class.Extends) > 0 {
-			if typ, found := findClass(class.Extends, class.Package, classMap); found {
+			if typ, found := classMap[class.Extends]; found {
 				class.ExtendsResource = typ.Resource || len(typ.Resources) > 0
 			}
 		}
@@ -113,25 +111,12 @@ func isWritable(attribs []types.Attribute) bool {
 	return false
 }
 
-func findClass(className string, packageContext string, classMap map[string]*types.Class) (*types.Class, bool) {
-	qualifiedKey := fmt.Sprintf("%s.%s", packageContext, className)
-	if class, found := classMap[qualifiedKey]; found {
-		return class, true
-	}
-	if class, found := classMap[className]; found {
-		return class, true
-	}
-	return nil, false
-}
-
 func isResource(class *types.Class, classMap map[string]*types.Class) bool {
 	if len(class.Relations) > 0 {
 		return true
 	}
 	if len(class.Extends) > 0 {
-		if extendedClass, found := findClass(class.Extends, class.Package, classMap); found {
-			return isResource(extendedClass, classMap)
-		}
+		return isResource(classMap[class.Extends], classMap)
 	}
 	return false
 }
@@ -141,18 +126,14 @@ func identifiableFromExtends(class *types.Class, classMap map[string]*types.Clas
 		return true
 	}
 	if len(class.Extends) > 0 {
-		if extendedClass, found := findClass(class.Extends, class.Package, classMap); found {
-			return identifiableFromExtends(extendedClass, classMap)
-		}
+		return identifiableFromExtends(classMap[class.Extends], classMap)
 	}
 	return false
 }
 
 func extendsIdentifiable(class *types.Class, classMap map[string]*types.Class) bool {
 	if len(class.Extends) > 0 {
-		if extendedClass, found := findClass(class.Extends, class.Package, classMap); found {
-			return extendedClass.Identifiable
-		}
+		return identifiableFromExtends(classMap[class.Extends], classMap)
 	}
 	return false
 }
@@ -169,67 +150,41 @@ func identifiable(attribs []types.Attribute) bool {
 
 }
 
-func findImport(typeName string, packageContext string, imports map[string]types.Import) (types.Import, bool) {
-	qualifiedKey := fmt.Sprintf("%s.%s", packageContext, typeName)
-	if imp, found := imports[qualifiedKey]; found {
-		return imp, true
-	}
-	if imp, found := imports[typeName]; found {
-		return imp, false
-	}
-	return types.Import{}, false
-}
-
 func getImports(c *types.Class, imports map[string]types.Import) []string {
+
 	attribs := c.Attributes
 	var imps []string
-
-	// Add imports for attributes
 	for _, att := range attribs {
 		javaType := types.GetJavaType(att.Type)
-		if len(javaType) > 0 {
-			imp, _ := findImport(javaType, c.Package, imports)
-			if imp.Java != "" && imp.Java != c.Package {
-				imps = append(imps, imp.Java)
-			}
+		if imports[javaType].Java != c.Package && len(javaType) > 0 {
+			imps = append(imps, imports[javaType].Java)
 		}
 	}
 
-	// Add import for extended class
 	if len(c.Extends) > 0 {
-		imp, _ := findImport(c.Extends, c.Package, imports)
-		if imp.Java != "" {
-			imps = append(imps, imp.Java)
-		}
+		imps = append(imps, imports[c.Extends].Java)
 	}
 
 	return utils.Distinct(utils.TrimArray(imps))
 }
 
 func getUsing(c *types.Class, imports map[string]types.Import) []string {
-	attribs := c.Attributes
-	var using []string
 
-	// Add usings for attributes
+	attribs := c.Attributes
+	var imps []string
 	for _, att := range attribs {
 		csType := types.GetCSType(att.Type)
-		if len(csType) > 0 {
-			imp, wasQualified := findImport(csType, c.Package, imports)
-			if imp.CSharp != "" && (wasQualified || imp.CSharp != c.Namespace) {
-				using = append(using, imp.CSharp)
-			}
+		if imports[csType].CSharp != c.Package && len(imports[csType].CSharp) > 0 {
+			imps = append(imps, imports[csType].CSharp)
 		}
 	}
 
-	// Add using for extended class
 	if len(c.Extends) > 0 {
-		imp, wasQualified := findImport(c.Extends, c.Package, imports)
-		if imp.CSharp != "" && (wasQualified || imp.CSharp != c.Namespace) {
-			using = append(using, imp.CSharp)
-		}
+		imps = append(imps, imports[c.Extends].CSharp)
 	}
 
-	return utils.Distinct(utils.TrimArray(using))
+	return utils.Distinct(utils.TrimArray(imps))
+
 }
 
 func getPackagePath(c *xmlquery.Node, doc *xmlquery.Node) string {
