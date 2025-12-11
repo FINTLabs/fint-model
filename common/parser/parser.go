@@ -325,6 +325,8 @@ func buildAssociationQueries(idref string) []types.AssociationQuery {
 func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 	var assocs []types.Association
 
+	classId := c.SelectAttr("idref")
+	isParent := isExtendedByOthers(doc, classId)
 	queries := buildAssociationQueries(c.SelectAttr("idref"))
 
 	for _, q := range queries {
@@ -333,41 +335,51 @@ func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 				continue
 			}
 
-			props := relationElement.SelectElement("../../properties")
-			direction := ""
-			if props != nil {
-				direction = props.SelectAttr("direction")
-			}
-
-			classElement := findClassElementByID(doc, relationElement.Parent.SelectAttr("idref"))
-
-			assoc := types.Association{}
-			assoc.Name = replaceNO(relationElement.SelectAttr("name"))
-			assoc.Target = replaceNO(relationElement.SelectElement("../model").SelectAttr("name"))
-			assoc.Multiplicity = relationElement.SelectElement("../type").SelectAttr("multiplicity")
-			assoc.Package = getPackagePath(classElement, doc)
-			assoc.Deprecated = relationElement.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
-
-			if direction == "Bi-Directional" {
-				if q.Role == "source" {
-					assoc.Source = replaceNO(relationElement.SelectElement("../../source/role").SelectAttr("name"))
-				} else {
-					assoc.Source = replaceNO(relationElement.SelectElement("../../target/role").SelectAttr("name"))
-				}
-			} else {
-				targetIdref := relationElement.Parent.SelectAttr("idref")
-				if len(targetIdref) > 0 {
-					inverseName := getInverseNameFromParentClass(doc, c.SelectAttr("idref"), targetIdref)
-					if len(inverseName) > 0 {
-						assoc.Source = inverseName
-					}
-				}
-			}
-
+			assoc := buildAssociation(doc, relationElement, q.Role, isParent)
 			assocs = append(assocs, assoc)
 		}
 	}
 	return assocs
+}
+
+func buildAssociation(doc *xmlquery.Node, rel *xmlquery.Node, role types.AssociationRole, isParent bool) types.Association {
+	targetId := rel.Parent.SelectAttr("idref")
+	targetClassElement := findClassElementByID(doc, targetId)
+
+	return types.Association{
+		Name:         replaceNO(rel.SelectAttr("name")),
+		Target:       replaceNO(rel.SelectElement("../model").SelectAttr("name")),
+		Multiplicity: rel.SelectElement("../type").SelectAttr("multiplicity"),
+		Package:      getPackagePath(targetClassElement, doc),
+		Deprecated:   rel.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil,
+		Source:       getAssociationSource(rel, role, isParent),
+	}
+}
+
+func getAssociationSource(rel *xmlquery.Node, role types.AssociationRole, isParent bool) string {
+	direction := rel.SelectElement("../../properties").SelectAttr("direction")
+
+	if direction != "Bi-Directional" || isParent {
+		return ""
+	}
+
+	var sourceNode *xmlquery.Node
+	if role == types.RoleSource {
+		sourceNode = rel.SelectElement("../../source/role")
+	} else {
+		sourceNode = rel.SelectElement("../../target/role")
+	}
+
+	if sourceNode != nil {
+		return replaceNO(sourceNode.SelectAttr("name"))
+	}
+
+	return ""
+}
+
+func isExtendedByOthers(doc *xmlquery.Node, classId string) bool {
+	xpath := fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../target[@idref='%s']", classId)
+	return xmlquery.FindOne(doc, xpath) != nil
 }
 
 func findClassElementByID(doc *xmlquery.Node, id string) *xmlquery.Node {
