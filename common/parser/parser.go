@@ -309,31 +309,77 @@ func getAttributes(c *xmlquery.Node) []types.Attribute {
 	return attributes
 }
 
+func buildAssociationQueries(idref string) []types.AssociationQuery {
+	return []types.AssociationQuery{
+		{
+			XPath: fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role", idref),
+			Role:  types.RoleSource,
+		},
+		{
+			XPath: fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role", idref),
+			Role:  types.RoleTarget,
+		},
+	}
+}
+
 func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 	var assocs []types.Association
 
-	queries := [...]string{
-		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../source[@idref='%s']/../target/role", c.SelectAttr("idref")),
-		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association']/../target[@idref='%s']/../source/role", c.SelectAttr("idref")),
-	}
+	classId := c.SelectAttr("idref")
+	isParent := isExtendedByOthers(doc, classId)
+	queries := buildAssociationQueries(c.SelectAttr("idref"))
 
-	for _, query := range queries {
-		for _, relationElement := range xmlquery.Find(doc, query) {
-			if len(relationElement.SelectAttr("name")) > 0 {
-				classElement := findClassElementByID(doc, relationElement.Parent.SelectAttr("idref"))
-
-				assoc := types.Association{}
-				assoc.Name = replaceNO(relationElement.SelectAttr("name"))
-				assoc.Target = replaceNO(relationElement.SelectElement("../model").SelectAttr("name"))
-				assoc.Multiplicity = relationElement.SelectElement("../type").SelectAttr("multiplicity")
-				assoc.Deprecated = relationElement.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil
-				assoc.Package = getPackagePath(classElement, doc)
-
-				assocs = append(assocs, assoc)
+	for _, q := range queries {
+		for _, relationElement := range xmlquery.Find(doc, q.XPath) {
+			if len(relationElement.SelectAttr("name")) == 0 {
+				continue
 			}
+
+			assoc := buildAssociation(doc, relationElement, q.Role, isParent)
+			assocs = append(assocs, assoc)
 		}
 	}
 	return assocs
+}
+
+func buildAssociation(doc *xmlquery.Node, rel *xmlquery.Node, role types.AssociationRole, isParent bool) types.Association {
+	targetId := rel.Parent.SelectAttr("idref")
+	targetClassElement := findClassElementByID(doc, targetId)
+
+	return types.Association{
+		Name:         replaceNO(rel.SelectAttr("name")),
+		Target:       replaceNO(rel.SelectElement("../model").SelectAttr("name")),
+		Multiplicity: rel.SelectElement("../type").SelectAttr("multiplicity"),
+		Package:      getPackagePath(targetClassElement, doc),
+		Deprecated:   rel.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil,
+		Source:       getAssociationSource(rel, role, isParent),
+	}
+}
+
+func getAssociationSource(rel *xmlquery.Node, role types.AssociationRole, isParent bool) string {
+	direction := rel.SelectElement("../../properties").SelectAttr("direction")
+
+	if direction != "Bi-Directional" || isParent {
+		return ""
+	}
+
+	var sourceNode *xmlquery.Node
+	if role == types.RoleSource {
+		sourceNode = rel.SelectElement("../../source/role")
+	} else {
+		sourceNode = rel.SelectElement("../../target/role")
+	}
+
+	if sourceNode != nil {
+		return replaceNO(sourceNode.SelectAttr("name"))
+	}
+
+	return ""
+}
+
+func isExtendedByOthers(doc *xmlquery.Node, classId string) bool {
+	xpath := fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../target[@idref='%s']", classId)
+	return xmlquery.FindOne(doc, xpath) != nil
 }
 
 func findClassElementByID(doc *xmlquery.Node, id string) *xmlquery.Node {
@@ -341,8 +387,36 @@ func findClassElementByID(doc *xmlquery.Node, id string) *xmlquery.Node {
 	return xmlquery.FindOne(doc, query)
 }
 
-func getExtendsAssociations(doc *xmlquery.Node, c *xmlquery.Node) bool {
+func getInverseNameFromParentClass(doc *xmlquery.Node, sourceClassIdref string, targetClassIdref string) string {
+	generalizationTargets := xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source[@idref='%s']/../target[@idref]", targetClassIdref))
 
+	if len(generalizationTargets) != 1 {
+		return ""
+	}
+
+	parentIdref := generalizationTargets[0].SelectAttr("idref")
+	if len(parentIdref) == 0 {
+		return ""
+	}
+
+	queries := []string{
+		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association'][@direction='Bi-Directional']/../source[@idref='%s']/../target[@idref='%s']/../target/role", parentIdref, sourceClassIdref),
+		fmt.Sprintf("//connectors/connector/properties[@ea_type='Association'][@direction='Bi-Directional']/../target[@idref='%s']/../source[@idref='%s']/../source/role", parentIdref, sourceClassIdref),
+	}
+
+	for _, query := range queries {
+		for _, roleElement := range xmlquery.Find(doc, query) {
+			roleName := roleElement.SelectAttr("name")
+			if len(roleName) > 0 {
+				return replaceNO(roleName)
+			}
+		}
+	}
+
+	return ""
+}
+
+func getExtendsAssociations(doc *xmlquery.Node, c *xmlquery.Node) bool {
 	generalizationTargets := xmlquery.Find(doc, fmt.Sprintf("//connectors/connector/properties[@ea_type='Generalization']/../source[@idref='%s']/../target[@idref]", c.SelectAttr("idref")))
 
 	if len(generalizationTargets) == 1 && len(generalizationTargets[0].SelectAttr("idref")) > 0 {
