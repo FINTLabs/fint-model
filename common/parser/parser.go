@@ -175,7 +175,7 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 	for _, class := range classes {
 		if len(class.Extends) > 0 {
 			if typ, found := findClass(class.Extends, class.Package, classMap, classNameMap); found {
-				class.ExtendsResource = typ.Resource || len(typ.Resources) > 0 || typ.Identifiable
+				class.ExtendsResource = typ.Resource || len(typ.Resources) > 0
 			}
 		}
 	}
