@@ -18,5 +18,8 @@ jobs:
       - name: Install dependencies
         run: go get .
 
+      - name: Test
+        run: go test ./...
+
       - name: Build
         run: go build -a -v

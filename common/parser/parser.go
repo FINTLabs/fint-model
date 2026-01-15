@@ -12,13 +12,86 @@ import (
 	xmlquery "github.com/antchfx/xquery/xml"
 )
 
+type importCandidate struct {
+	Package string
+	Import  types.Import
+}
+
+func qualifiedKey(pkg string, name string) string {
+	return fmt.Sprintf("%s.%s", pkg, name)
+}
+
+func makeImportForClass(c *types.Class) types.Import {
+	return types.Import{
+		Java:   qualifiedKey(c.Package, c.Name),
+		CSharp: c.Namespace,
+	}
+}
+
+func buildImportNameMap(imports map[string]types.Import) map[string][]importCandidate {
+	result := make(map[string][]importCandidate)
+	for key, imp := range imports {
+		lastDot := strings.LastIndex(key, ".")
+		if lastDot < 0 {
+			continue
+		}
+		name := key[lastDot+1:]
+		pkg := key[:lastDot]
+		result[name] = append(result[name], importCandidate{Package: pkg, Import: imp})
+	}
+	return result
+}
+
+func pickPackage(packageContext string, candidatePackage string, currentBest string) (string, bool) {
+	if candidatePackage != packageContext && !strings.HasPrefix(candidatePackage, packageContext+".") {
+		return currentBest, false
+	}
+	if currentBest == "" || len(candidatePackage) < len(currentBest) {
+		return candidatePackage, false
+	}
+	if len(candidatePackage) == len(currentBest) {
+		return currentBest, true
+	}
+	return currentBest, false
+}
+
+func resolveClassCandidate(packageContext string, candidates []*types.Class) (*types.Class, bool) {
+	var best *types.Class
+	bestPackage := ""
+	tie := false
+	for _, c := range candidates {
+		var t bool
+		bestPackage, t = pickPackage(packageContext, c.Package, bestPackage)
+		tie = tie || t
+		if bestPackage == c.Package {
+			best = c
+		}
+	}
+	return best, best != nil && !tie
+}
+
+func resolveImportCandidate(packageContext string, candidates []importCandidate) (types.Import, bool) {
+	var best types.Import
+	bestPackage := ""
+	tie := false
+	for _, c := range candidates {
+		var t bool
+		bestPackage, t = pickPackage(packageContext, c.Package, bestPackage)
+		tie = tie || t
+		if bestPackage == c.Package {
+			best = c.Import
+		}
+	}
+	return best, len(bestPackage) > 0 && !tie
+}
+
 func GetClasses(owner string, repo string, tag string, filename string, force bool) ([]*types.Class, map[string]types.Import, map[string][]*types.Class, map[string][]*types.Class) {
 	doc := document.Get(owner, repo, tag, filename, force)
 
 	var classes []*types.Class
-	// TODO BUG: packageMap and classMap fail for classes with the same name!
 	packageMap := make(map[string]types.Import)
 	classMap := make(map[string]*types.Class)
+	classNameMap := make(map[string][]*types.Class)
 	javaPackageClassMap := make(map[string][]*types.Class)
 	csPackageClassMap := make(map[string][]*types.Class)
 
@@ -48,27 +121,36 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 			}
 		}
 
-		imp := types.Import{
-			Java:   fmt.Sprintf("%s.%s", class.Package, class.Name),
-			CSharp: class.Namespace,
-		}
-		packageMap[class.Name] = imp
+		imp := makeImportForClass(class)
+		key := qualifiedKey(class.Package, class.Name)
+		packageMap[key] = imp
 
 		classes = append(classes, class)
-		classMap[class.Name] = class
+		classMap[key] = class
+		classNameMap[class.Name] = append(classNameMap[class.Name], class)
+	}
+
+	for name, list := range classNameMap {
+		if len(list) == 1 {
+			imp := makeImportForClass(list[0])
+			packageMap[name] = imp
+			classMap[name] = list[0]
+		}
 	}
 
 	packageMap["Date"] = types.Import{
 		Java: "java.util.Date",
 	}
 
+	importNameMap := buildImportNameMap(packageMap)
+
 	for _, class := range classes {
-		class.Imports = getImports(class, packageMap)
-		class.Using = getUsing(class, packageMap)
-		class.Identifiable = identifiableFromExtends(class, classMap)
-		class.ExtendsIdentifiable = extendsIdentifiable(class, classMap)
+		class.Imports = getImports(class, packageMap, importNameMap)
+		class.Using = getUsing(class, packageMap, importNameMap)
+		class.Identifiable = identifiableFromExtends(class, classMap, classNameMap)
+		class.ExtendsIdentifiable = extendsIdentifiable(class, classMap, classNameMap)
 		class.Writable = isWritable(class.Attributes)
-		class.Resource = isResource(class, classMap)
+		class.Resource = isResource(class, classMap, classNameMap)
 		javaPackageClassMap[class.Package] = append(javaPackageClassMap[class.Package], class)
 		csPackageClassMap[class.Namespace] = append(csPackageClassMap[class.Namespace], class)
 		if len(class.Stereotype) == 0 {
@@ -82,7 +164,7 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 
 	for _, class := range classes {
 		for _, a := range class.Attributes {
-			if typ, found := classMap[a.Type]; found {
+			if typ, found := findClass(a.Type, class.Package, classMap, classNameMap); found {
 				if typ.Resource {
 					class.Resources = append(class.Resources, a)
 				}
@@ -92,7 +174,7 @@ func GetClasses(owner string, repo string, tag string, filename string, force bo
 
 	for _, class := range classes {
 		if len(class.Extends) > 0 {
-			if typ, found := classMap[class.Extends]; found {
+			if typ, found := findClass(class.Extends, class.Package, classMap, classNameMap); found {
 				class.ExtendsResource = typ.Resource || len(typ.Resources) > 0
 			}
 		}
@@ -111,29 +193,49 @@ func isWritable(attribs []types.Attribute) bool {
 	return false
 }
 
-func isResource(class *types.Class, classMap map[string]*types.Class) bool {
+func findClass(className string, packageContext string, classMap map[string]*types.Class, classNameMap map[string][]*types.Class) (*types.Class, bool) {
+	if class, found := classMap[className]; found {
+		return class, true
+	}
+	if class, found := classMap[qualifiedKey(packageContext, className)]; found {
+		return class, true
+	}
+	candidates := classNameMap[className]
+	if len(candidates) == 1 {
+		return candidates[0], true
+	}
+	return resolveClassCandidate(packageContext, candidates)
+}
+
+func isResource(class *types.Class, classMap map[string]*types.Class, classNameMap map[string][]*types.Class) bool {
 	if len(class.Relations) > 0 {
 		return true
 	}
 	if len(class.Extends) > 0 {
-		return isResource(classMap[class.Extends], classMap)
+		if extendedClass, found := findClass(class.Extends, class.Package, classMap, classNameMap); found {
+			return isResource(extendedClass, classMap, classNameMap)
+		}
 	}
 	return false
 }
 
-func identifiableFromExtends(class *types.Class, classMap map[string]*types.Class) bool {
+func identifiableFromExtends(class *types.Class, classMap map[string]*types.Class, classNameMap map[string][]*types.Class) bool {
 	if class.Identifiable {
 		return true
 	}
 	if len(class.Extends) > 0 {
-		return identifiableFromExtends(classMap[class.Extends], classMap)
+		if extendedClass, found := findClass(class.Extends, class.Package, classMap, classNameMap); found {
+			return identifiableFromExtends(extendedClass, classMap, classNameMap)
+		}
 	}
 	return false
 }
 
-func extendsIdentifiable(class *types.Class, classMap map[string]*types.Class) bool {
+func extendsIdentifiable(class *types.Class, classMap map[string]*types.Class, classNameMap map[string][]*types.Class) bool {
 	if len(class.Extends) > 0 {
-		return identifiableFromExtends(classMap[class.Extends], classMap)
+		if extendedClass, found := findClass(class.Extends, class.Package, classMap, classNameMap); found {
+			return identifiableFromExtends(extendedClass, classMap, classNameMap)
+		}
 	}
 	return false
 }
@@ -150,37 +252,60 @@ func identifiable(attribs []types.Attribute) bool {
 
 }
 
-func getImports(c *types.Class, imports map[string]types.Import) []string {
+func findImport(typeName string, packageContext string, imports map[string]types.Import, importNameMap map[string][]importCandidate) (types.Import, bool) {
+	if imp, found := imports[typeName]; found {
+		return imp, true
+	}
+	if imp, found := imports[qualifiedKey(packageContext, typeName)]; found {
+		return imp, true
+	}
+	return resolveImportCandidate(packageContext, importNameMap[typeName])
+}
+
+func getImports(c *types.Class, imports map[string]types.Import, importNameMap map[string][]importCandidate) []string {
 
 	attribs := c.Attributes
+	self := qualifiedKey(c.Package, c.Name)
 	var imps []string
 	for _, att := range attribs {
 		javaType := types.GetJavaType(att.Type)
-		if imports[javaType].Java != c.Package && len(javaType) > 0 {
-			imps = append(imps, imports[javaType].Java)
+		if len(javaType) > 0 {
+			imp, found := findImport(javaType, c.Package, imports, importNameMap)
+			if found && len(imp.Java) > 0 && imp.Java != self {
+				imps = append(imps, imp.Java)
+			}
 		}
 	}
 
 	if len(c.Extends) > 0 {
-		imps = append(imps, imports[c.Extends].Java)
+		imp, found := findImport(c.Extends, c.Package, imports, importNameMap)
+		if found && len(imp.Java) > 0 && imp.Java != self {
+			imps = append(imps, imp.Java)
+		}
 	}
 
 	return utils.Distinct(utils.TrimArray(imps))
 }
 
-func getUsing(c *types.Class, imports map[string]types.Import) []string {
+func getUsing(c *types.Class, imports map[string]types.Import, importNameMap map[string][]importCandidate) []string {
 
 	attribs := c.Attributes
 	var imps []string
 	for _, att := range attribs {
 		csType := types.GetCSType(att.Type)
-		if imports[csType].CSharp != c.Package && len(imports[csType].CSharp) > 0 {
-			imps = append(imps, imports[csType].CSharp)
+		if len(csType) > 0 {
+			imp, found := findImport(csType, c.Package, imports, importNameMap)
+			if found && len(imp.CSharp) > 0 && imp.CSharp != c.Namespace {
+				imps = append(imps, imp.CSharp)
+			}
 		}
 	}
 
 	if len(c.Extends) > 0 {
-		imps = append(imps, imports[c.Extends].CSharp)
+		imp, found := findImport(c.Extends, c.Package, imports, importNameMap)
+		if found && len(imp.CSharp) > 0 && imp.CSharp != c.Namespace {
+			imps = append(imps, imp.CSharp)
+		}
 	}
 
 	return utils.Distinct(utils.TrimArray(imps))
