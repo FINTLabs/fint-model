@@ -477,11 +477,11 @@ func buildAssociation(doc *xmlquery.Node, rel *xmlquery.Node, role types.Associa
 		Multiplicity: rel.SelectElement("../type").SelectAttr("multiplicity"),
 		Package:      getPackagePath(targetClassElement, doc),
 		Deprecated:   rel.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil,
-		InverseName:  getAssociationSource(rel, role, isParent),
+		InverseName:  getAssociationInverseName(rel, role, isParent),
 	}
 }
 
-func getAssociationSource(rel *xmlquery.Node, role types.AssociationRole, isParent bool) string {
+func getAssociationInverseName(rel *xmlquery.Node, role types.AssociationRole, isParent bool) string {
 	direction := rel.SelectElement("../../properties").SelectAttr("direction")
 
 	if direction != "Bi-Directional" || isParent {
