@@ -51,7 +51,7 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     @Getter
     public enum Relasjonsnavn implements FintRelation {
         {{- range $i, $rel := .Relations }}
-        {{ upperCase $rel.Name }}("{{ $rel.Name }}", "{{ $rel.Package }}.{{ $rel.Target }}", {{ resolveMultiplicity $rel.Multiplicity }}, {{ resolveSource $rel.Source }}){{ if ne $i $c }},{{ else }};{{ end -}}
+        {{ upperCase $rel.Name }}("{{ $rel.Name }}", "{{ $rel.Package }}.{{ $rel.Target }}", {{ resolveMultiplicity $rel.Multiplicity }}, {{ resolveSource $rel.InverseName }}){{ if ne $i $c }},{{ else }};{{ end -}}
         {{ end }}
     
         private final String name;

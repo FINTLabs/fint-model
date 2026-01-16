@@ -477,7 +477,7 @@ func buildAssociation(doc *xmlquery.Node, rel *xmlquery.Node, role types.Associa
 		Multiplicity: rel.SelectElement("../type").SelectAttr("multiplicity"),
 		Package:      getPackagePath(targetClassElement, doc),
 		Deprecated:   rel.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil,
-		Source:       getAssociationSource(rel, role, isParent),
+		InverseName:  getAssociationSource(rel, role, isParent),
 	}
 }
 
