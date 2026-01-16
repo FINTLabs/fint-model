@@ -90,6 +90,12 @@ var funcMap = template.FuncMap{
 		}
 		return strconv.Quote(inverseName)
 	},
+	"resolveSource": func(inverseName string, isSource bool) string {
+		if inverseName == "" {
+			return "null"
+		}
+		return strconv.FormatBool(isSource)
+	},
 	"modelRename": func(s string) string {
 		if s == "FintMainObject" {
 			return "FintModelObject"
