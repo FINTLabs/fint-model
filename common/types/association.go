@@ -7,4 +7,5 @@ type Association struct {
 	Package      string
 	Deprecated   bool
 	Multiplicity string
+	IsSource     bool
 }
