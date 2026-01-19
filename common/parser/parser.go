@@ -460,14 +460,22 @@ func getAssociations(doc *xmlquery.Node, c *xmlquery.Node) []types.Association {
 				continue
 			}
 
-			assoc := buildAssociation(doc, relationElement, q.Role, isParent)
+			connector := relationElement.Parent.Parent
+			isSource := isStructuralSource(connector, classId)
+
+			assoc := buildAssociation(doc, relationElement, q.Role, isParent, isSource)
 			assocs = append(assocs, assoc)
 		}
 	}
 	return assocs
 }
 
-func buildAssociation(doc *xmlquery.Node, rel *xmlquery.Node, role types.AssociationRole, isParent bool) types.Association {
+func isStructuralSource(connector *xmlquery.Node, classId string) bool {
+	structuralSourceID := connector.SelectElement("source").SelectAttr("idref")
+	return structuralSourceID == classId
+}
+
+func buildAssociation(doc *xmlquery.Node, rel *xmlquery.Node, role types.AssociationRole, isParent bool, isSource bool) types.Association {
 	targetId := rel.Parent.SelectAttr("idref")
 	targetClassElement := findClassElementByID(doc, targetId)
 
@@ -477,11 +485,12 @@ func buildAssociation(doc *xmlquery.Node, rel *xmlquery.Node, role types.Associa
 		Multiplicity: rel.SelectElement("../type").SelectAttr("multiplicity"),
 		Package:      getPackagePath(targetClassElement, doc),
 		Deprecated:   rel.SelectElement("../../tags/tag[@name='DEPRECATED']") != nil,
-		Source:       getAssociationSource(rel, role, isParent),
+		InverseName:  getAssociationInverseName(rel, role, isParent),
+		IsSource:     isSource,
 	}
 }
 
-func getAssociationSource(rel *xmlquery.Node, role types.AssociationRole, isParent bool) string {
+func getAssociationInverseName(rel *xmlquery.Node, role types.AssociationRole, isParent bool) string {
 	direction := rel.SelectElement("../../properties").SelectAttr("direction")
 
 	if direction != "Bi-Directional" || isParent {

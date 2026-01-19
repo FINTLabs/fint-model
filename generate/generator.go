@@ -84,11 +84,17 @@ var funcMap = template.FuncMap{
 			return multiplicity
 		}
 	},
-	"resolveSource": func(source string) string {
-		if source == "" {
+	"resolveInverseName": func(inverseName string) string {
+		if inverseName == "" {
 			return "null"
 		}
-		return strconv.Quote(source)
+		return strconv.Quote(inverseName)
+	},
+	"resolveSource": func(inverseName string, isSource bool) string {
+		if inverseName == "" {
+			return "null"
+		}
+		return strconv.FormatBool(isSource)
 	},
 	"modelRename": func(s string) string {
 		if s == "FintMainObject" {

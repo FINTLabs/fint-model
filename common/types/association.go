@@ -3,8 +3,9 @@ package types
 type Association struct {
 	Name         string
 	Target       string
-	Source       string
+	InverseName  string
 	Package      string
 	Deprecated   bool
 	Multiplicity string
+	IsSource     bool
 }

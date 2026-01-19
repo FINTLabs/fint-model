@@ -51,19 +51,21 @@ public {{- if .Abstract }} abstract {{- end }} class {{ .Name }} {{ if .Extends 
     @Getter
     public enum Relasjonsnavn implements FintRelation {
         {{- range $i, $rel := .Relations }}
-        {{ upperCase $rel.Name }}("{{ $rel.Name }}", "{{ $rel.Package }}.{{ $rel.Target }}", {{ resolveMultiplicity $rel.Multiplicity }}, {{ resolveSource $rel.Source }}){{ if ne $i $c }},{{ else }};{{ end -}}
+        {{ upperCase $rel.Name }}("{{ $rel.Name }}", "{{ $rel.Package }}.{{ $rel.Target }}", {{ resolveMultiplicity $rel.Multiplicity }}, {{ resolveSource $rel.InverseName $rel.IsSource }}, {{ resolveInverseName $rel.InverseName }}){{ if ne $i $c }},{{ else }};{{ end -}}
         {{ end }}
     
         private final String name;
         private final String packageName;
         private final FintMultiplicity multiplicity;
         private final String inverseName;
+        private final Boolean isSource;
 
-        private Relasjonsnavn(String name, String packageName, FintMultiplicity multiplicity, String inverseName) {
+        private Relasjonsnavn(String name, String packageName, FintMultiplicity multiplicity, Boolean isSource, String inverseName) {
             this.name = name;
             this.packageName = packageName;
             this.multiplicity = multiplicity;
             this.inverseName = inverseName;
+            this.isSource = isSource;
         }
     }
 {{ end -}}
