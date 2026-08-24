@@ -2,7 +2,7 @@
 github.com/antchfx/xpath
 # github.com/antchfx/xquery v0.0.0-20180515051857-ad5b8c7a47b0
 github.com/antchfx/xquery/xml
-# github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d
+# github.com/cpuguy83/go-md2man/v2 v2.0.7
 github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/google/go-github v17.0.0+incompatible
 github.com/google/go-github/github
@@ -10,11 +10,9 @@ github.com/google/go-github/github
 github.com/google/go-querystring/query
 # github.com/mitchellh/go-homedir v1.1.0
 github.com/mitchellh/go-homedir
-# github.com/russross/blackfriday/v2 v2.0.1
+# github.com/russross/blackfriday/v2 v2.1.0
 github.com/russross/blackfriday/v2
-# github.com/shurcooL/sanitized_anchor_name v1.0.0
-github.com/shurcooL/sanitized_anchor_name
-# github.com/urfave/cli v1.22.2
+# github.com/urfave/cli v1.22.17
 github.com/urfave/cli
 # golang.org/x/net v0.7.0
 golang.org/x/net/context
