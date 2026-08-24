@@ -42,6 +42,20 @@ GLOBAL OPTIONS:
 The downloaded XMI file is put in the `$HOME/.fint-model/.cache`. If you don't use the 
 `force` flag and the file exists in the cache directory it uses this one. 
 
+## Examples
+
+### Run from binary
+
+```bash
+go install && ~/go/bin/fint-model --tag v4.1.0 generate --lang JAVA --resource
+```
+
+### Run from Docker
+
+```bash
+docker build -t fint-model . && docker run --rm fint-model --tag v4.1.0 generate --lang JAVA --resource
+```
+
 ## Install
 
 ### Binaries
