@@ -1,14 +1,14 @@
 module github.com/FINTLabs/fint-model
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/antchfx/xquery v0.0.0-20180515051857-ad5b8c7a47b0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/urfave/cli v1.22.17
-	golang.org/x/net v0.58.0
-	golang.org/x/text v0.41.0
+	golang.org/x/net v0.59.0
+	golang.org/x/text v0.42.0
 )
 
 require (
