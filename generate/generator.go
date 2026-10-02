@@ -40,7 +40,7 @@ var funcMap = template.FuncMap{
 	},
 	"javaType": types.GetJavaType,
 	"validFilt": func(t string, s string) string {
-		_, ok := types.JAVA_TYPE_MAP[t]
+		_, ok := types.JAVA_TYPE_MAP[strings.ToLower(t)]
 		if ok {
 			return s
 		}
