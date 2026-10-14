@@ -7,8 +7,8 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/urfave/cli v1.22.17
-	golang.org/x/net v0.59.0
-	golang.org/x/text v0.42.0
+	golang.org/x/net v0.61.0
+	golang.org/x/text v0.43.0
 )
 
 require (
