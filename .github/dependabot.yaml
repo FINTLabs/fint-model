@@ -1,16 +1,28 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - "*"
     directory: "/"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "gomod"
+    groups:
+      gomod-dependencies:
+        patterns:
+          - "*"
     directory: "/"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "docker"
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
     directory: "/"
     schedule:
       interval: "weekly"
